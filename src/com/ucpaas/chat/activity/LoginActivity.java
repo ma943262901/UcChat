@@ -1,25 +1,20 @@
 package com.ucpaas.chat.activity;
 
-import java.io.IOException;
+import com.alibaba.fastjson.JSON;
+import com.squareup.okhttp.Request;
+import com.ucpaas.chat.R;
+import com.ucpaas.chat.base.BaseActivity;
+import com.ucpaas.chat.bean.UserInfo;
+import com.ucpaas.chat.config.AppConstants;
+import com.ucpaas.chat.util.LogUtil;
+import com.ucpaas.chat.util.OkHttpClientManager;
+import com.ucpaas.chat.util.ToastUtil;
 
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
-
-import com.alibaba.fastjson.JSON;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.ucpaas.chat.R;
-import com.ucpaas.chat.base.BaseActivity;
-import com.ucpaas.chat.bean.UserInfo;
-import com.ucpaas.chat.config.AppConstants;
-import com.ucpaas.chat.util.LogUtil;
-import com.ucpaas.chat.util.ToastUtil;
 
 /**
  * 登录界面
@@ -29,39 +24,43 @@ import com.ucpaas.chat.util.ToastUtil;
  */
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
-	private EditText login_admin;
-	private EditText login_pwd;
-	private OkHttpClient client;
+	private EditText mEtUserName;
+	@SuppressWarnings("unused")
+	private EditText mEtUserPwd;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	public void setContentLayout() {
+		// TODO Auto-generated method stub
 		setContentView(R.layout.activity_login);
-		setTitle("登录界面");
-
-		initData();
-		initView();
 	}
 
-	private void initData() {
+	@Override
+	public void beforeInitView() {
 		// TODO Auto-generated method stub
-		client = new OkHttpClient();
+
 	}
 
-	private void initView() {
+	@Override
+	public void initView() {
 		// TODO Auto-generated method stub
-		login_admin = (EditText) findViewById(R.id.login_admin);
-		login_pwd = (EditText) findViewById(R.id.login_pwd);
+		mEtUserName = (EditText) findViewById(R.id.login_admin);
+		mEtUserPwd = (EditText) findViewById(R.id.login_pwd);
 
 		findViewById(R.id.login_btn).setOnClickListener(this);
 		findViewById(R.id.login_register).setOnClickListener(this);
 	}
 
 	@Override
-	public void onClick(View v) {
+	public void afterInitView() {
+		// TODO Auto-generated method stub
+		setTitle("用户登录");
+		hideBackButton();
+	}
+
+	@Override
+	public void onViewClick(View v) {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
-
 		case R.id.login_btn:
 			login();
 			break;
@@ -79,7 +78,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	 */
 	private void login() {
 		// TODO Auto-generated method stub
-		String userName = login_admin.getText().toString();
+		String userName = mEtUserName.getText().toString();
 		LogUtil.log("login userName：" + userName);
 		if (checkUserInfo(userName)) {
 			String url = AppConstants.BASE_SERVER_URL + AppConstants.ACTION_USER_LOGIN + "?" + "phone=" + userName;
@@ -87,27 +86,32 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		}
 	}
 
+	/**
+	 * 用户登录-执行
+	 */
 	private void doLogin(String url) {
-		Request request = new Request.Builder().url(url).build();
 		LogUtil.log("doLogin：" + url);
 
-		Call call = client.newCall(request);
-		call.enqueue(new Callback() {
+		OkHttpClientManager.getAsyn(url, new OkHttpClientManager.ResultCallback<String>() {
 
 			@Override
-			public void onResponse(Response arg0) throws IOException {
+			public void onError(Request request, Exception e) {
 				// TODO Auto-generated method stub
-				String response = arg0.body().string();
+				ToastUtil.show(LoginActivity.this, "网络错误");
+			}
+
+			@Override
+			public void onResponse(String response) {
+				// TODO Auto-generated method stub
 				UserInfo userInfo = JSON.parseObject(response, UserInfo.class);
 
 				LogUtil.log("response:" + response);
 				LogUtil.log("userInfo:" + userInfo.toString());
-			}
-
-			@Override
-			public void onFailure(Request arg0, IOException arg1) {
-				// TODO Auto-generated method stub
-				LogUtil.log("onFailure");
+				if (userInfo.getResult() == 0) {
+					ToastUtil.show(LoginActivity.this, "登录成功");
+				} else {
+					ToastUtil.show(LoginActivity.this, "登录失败");
+				}
 			}
 		});
 	}

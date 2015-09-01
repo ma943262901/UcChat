@@ -8,17 +8,18 @@ package com.ucpaas.chat.bean;
  */
 
 public class UserInfo {
-	private String result;
+	
+	private int result;
 	private String phone;
 	private String imtoken;
 	private String nickname;
 	private String portraituri;
 
-	public String getResult() {
+	public int getResult() {
 		return result;
 	}
 
-	public void setResult(String result) {
+	public void setResult(int result) {
 		this.result = result;
 	}
 
@@ -56,8 +57,8 @@ public class UserInfo {
 
 	@Override
 	public String toString() {
-		return "UserInfo [result=" + result + ", phone=" + phone + ", imtoken=" + imtoken + ", nickname=" + nickname
-				+ ", portraituri=" + portraituri + "]";
+		return "UserInfo [result=" + result + ", phone=" + phone + ", imtoken=" + imtoken + ", nickname=" + nickname + ", portraituri=" + portraituri
+				+ "]";
 	}
 
 }
