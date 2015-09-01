@@ -79,15 +79,14 @@
                     android:background="@drawable/login_pwd" />
 
                 <EditText
-                    android:id="@+id/et_login_pwd"
+                    android:id="@+id/login_nickname"
                     android:layout_width="match_parent"
                     android:layout_height="40dip"
                     android:layout_gravity="center"
                     android:layout_marginLeft="10dip"
                     android:background="@null"
-                    android:hint="@string/login_pwd"
+                    android:hint="@string/login_nickname"
                     android:inputType="textNoSuggestions"
-                    android:password="true"
                     android:text=""
                     android:textColor="@color/black_text"
                     android:textColorHint="@color/gray_text" />
@@ -95,38 +94,19 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tv_login_login"
+            android:id="@+id/tv_register"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="10dip"
             android:layout_marginLeft="20dip"
             android:layout_marginRight="20dip"
             android:layout_marginTop="20dip"
             android:background="@drawable/login_login"
             android:clickable="false"
             android:gravity="center"
-            android:text="@string/login_login"
+            android:padding="10dip"
+            android:text="@string/login_register"
             android:textColor="@color/white"
             android:textSize="18sp" />
-
-        <ImageView
-            android:id="@+id/iv_login_register"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dip"
-            android:src="@drawable/login_register" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv_app_version"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_marginBottom="20dip"
-        android:layout_weight="1"
-        android:clickable="false"
-        android:gravity="bottom|center_horizontal"
-        android:text="当前版本V1.0"
-        android:textColor="#989898"
-        android:textSize="15sp" />
 
 </LinearLayout>

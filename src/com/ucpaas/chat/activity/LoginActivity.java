@@ -1,20 +1,24 @@
 package com.ucpaas.chat.activity;
 
+import android.content.Intent;
+import android.text.TextUtils;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.alibaba.fastjson.JSON;
 import com.squareup.okhttp.Request;
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.base.BaseActivity;
 import com.ucpaas.chat.bean.UserInfo;
-import com.ucpaas.chat.config.AppConstants;
+import com.ucpaas.chat.db.RequestFactory;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.OkHttpClientManager;
 import com.ucpaas.chat.util.ToastUtil;
-
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.EditText;
+import com.ucpaas.chat.util.VersionUtil;
 
 /**
  * 登录界面
@@ -27,6 +31,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	private EditText mEtUserName;
 	@SuppressWarnings("unused")
 	private EditText mEtUserPwd;
+	private TextView mTvAppVersion;
+	private long mExitTime;
+	private final static long TIME_DIFF = 2 * 1000;
 
 	@Override
 	public void setContentLayout() {
@@ -43,16 +50,20 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	@Override
 	public void initView() {
 		// TODO Auto-generated method stub
-		mEtUserName = (EditText) findViewById(R.id.login_admin);
-		mEtUserPwd = (EditText) findViewById(R.id.login_pwd);
+		mEtUserName = (EditText) findViewById(R.id.et_login_admin);
+		mEtUserPwd = (EditText) findViewById(R.id.et_login_pwd);
+		mTvAppVersion = (TextView) findViewById(R.id.tv_app_version);
 
-		findViewById(R.id.login_btn).setOnClickListener(this);
-		findViewById(R.id.login_register).setOnClickListener(this);
+		TextView btnLogin = (TextView) findViewById(R.id.tv_login_login);
+		ImageView ivRegister = (ImageView) findViewById(R.id.iv_login_register);
+		btnLogin.setOnClickListener(this);
+		ivRegister.setOnClickListener(this);
 	}
 
 	@Override
 	public void afterInitView() {
 		// TODO Auto-generated method stub
+		mTvAppVersion.setText("当前版本V" + VersionUtil.getVersionName(this));
 		setTitle("用户登录");
 		hideBackButton();
 	}
@@ -61,11 +72,12 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	public void onViewClick(View v) {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
-		case R.id.login_btn:
+		case R.id.tv_login_login:
 			login();
 			break;
 
-		case R.id.login_register:
+		case R.id.iv_login_register:
+			register();
 			break;
 
 		default:
@@ -74,20 +86,28 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	}
 
 	/**
+	 * 注册
+	 */
+	private void register() {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+		startActivity(intent);
+	}
+
+	/**
 	 * 用户登录
 	 */
 	private void login() {
 		// TODO Auto-generated method stub
 		String userName = mEtUserName.getText().toString();
-		LogUtil.log("login userName：" + userName);
 		if (checkUserInfo(userName)) {
-			String url = AppConstants.BASE_SERVER_URL + AppConstants.ACTION_USER_LOGIN + "?" + "phone=" + userName;
+			String url = RequestFactory.getInstance().getUserLogin(userName);
 			doLogin(url);
 		}
 	}
 
 	/**
-	 * 用户登录-执行
+	 * 用户登录-发送数据
 	 */
 	private void doLogin(String url) {
 		LogUtil.log("doLogin：" + url);
@@ -98,37 +118,76 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			public void onError(Request request, Exception e) {
 				// TODO Auto-generated method stub
 				ToastUtil.show(LoginActivity.this, "网络错误");
+				loginFailure();
 			}
 
 			@Override
 			public void onResponse(String response) {
 				// TODO Auto-generated method stub
 				UserInfo userInfo = JSON.parseObject(response, UserInfo.class);
-
 				LogUtil.log("response:" + response);
 				LogUtil.log("userInfo:" + userInfo.toString());
+
 				if (userInfo.getResult() == 0) {
-					ToastUtil.show(LoginActivity.this, "登录成功");
+					loginSuccess();
 				} else {
-					ToastUtil.show(LoginActivity.this, "登录失败");
+					ToastUtil.show(LoginActivity.this, "手机号无效，请先注册");
+					loginFailure();
 				}
 			}
 		});
 	}
 
 	/**
-	 * 检测用户信息
+	 * 登录成功
+	 */
+	private void loginSuccess() {
+		// TODO Auto-generated method stub
+		ToastUtil.show(LoginActivity.this, "登录成功");
+		Intent intent = new Intent(LoginActivity.this, TestApiActivity.class);
+		startActivity(intent);
+		finish();
+	}
+
+	/**
+	 * 登录失败
+	 */
+	private void loginFailure() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * 检测用户信息是否有效
 	 * 
 	 * @param userName
 	 * @return
 	 */
 	private boolean checkUserInfo(String userName) {
 		if (TextUtils.isEmpty(userName)) {
-			ToastUtil.show(this, "请输入正确的用户名");
+			ToastUtil.show(this, "请输入正确的手机号");
 			return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * 再按一次退出程序
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			if ((System.currentTimeMillis() - mExitTime) > TIME_DIFF) {
+				ToastUtil.show(LoginActivity.this, "再按一次退出程序");
+				mExitTime = System.currentTimeMillis();
+			} else {
+				System.exit(0);
+			}
+			return true;
+		}
+
+		return super.onKeyDown(keyCode, event);
 	}
 
 }
