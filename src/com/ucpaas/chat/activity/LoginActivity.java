@@ -9,12 +9,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
 import com.squareup.okhttp.Request;
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.base.BaseActivity;
 import com.ucpaas.chat.bean.UserInfo;
 import com.ucpaas.chat.db.RequestFactory;
+import com.ucpaas.chat.util.JSONUtils;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.OkHttpClientManager;
 import com.ucpaas.chat.util.ToastUtil;
@@ -124,7 +124,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			@Override
 			public void onResponse(String response) {
 				// TODO Auto-generated method stub
-				UserInfo userInfo = JSON.parseObject(response, UserInfo.class);
+				UserInfo userInfo = JSONUtils.parseObject(response, UserInfo.class);
 				LogUtil.log("response:" + response);
 				LogUtil.log("userInfo:" + userInfo.toString());
 

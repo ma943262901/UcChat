@@ -20,7 +20,6 @@ public class StringUtils {
 	 * @return
 	 */
 	public static String getUrl(String url, HashMap<String, String> params) {
-		// 添加url参数
 		if (params != null) {
 			Iterator<String> it = params.keySet().iterator();
 			StringBuffer sb = null;

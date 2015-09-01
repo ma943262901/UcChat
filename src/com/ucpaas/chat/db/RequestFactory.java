@@ -34,6 +34,18 @@ public class RequestFactory {
 	}
 
 	/**
+	 * 获取请求URL
+	 * 
+	 * @param action
+	 * @param params
+	 * @return
+	 */
+	private String getRequestUrl(String action, HashMap<String, String> params) {
+		String baseUrl = AppConstants.BASE_SERVER_URL + action;
+		return StringUtils.getUrl(baseUrl, params);
+	}
+
+	/**
 	 * 获取注册请求
 	 * 
 	 * @param userName
@@ -41,12 +53,12 @@ public class RequestFactory {
 	 * @return
 	 */
 	public String getUserRegister(String userName, String nickName) {
-		String baseUrl = AppConstants.BASE_SERVER_URL + AppConstants.ACTION_USER_REG;
+		String action = AppConstants.ACTION_USER_REG;
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("phone", userName);
 		params.put("nickname", nickName);
 
-		String url = StringUtils.getUrl(baseUrl, params);
+		String url = getRequestUrl(action, params);
 		return url;
 
 	}
@@ -58,11 +70,12 @@ public class RequestFactory {
 	 * @return
 	 */
 	public String getUserLogin(String userName) {
-		String baseUrl = AppConstants.BASE_SERVER_URL + AppConstants.ACTION_USER_LOGIN;
+		String action = AppConstants.ACTION_USER_LOGIN;
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("phone", userName);
 
-		String url = StringUtils.getUrl(baseUrl, params);
+		String url = getRequestUrl(action, params);
 		return url;
+
 	}
 }
