@@ -56,4 +56,14 @@ public class SpOperation {
 	public static String getToken(Context context) {
 		return SpHelper.getInstance(context).get(SpKey.TOKEN);
 	}
+
+	/**
+	 * 获取用户ID
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static String getUserId(Context context) {
+		return SpHelper.getInstance(context).get(SpKey.PHONE);
+	}
 }

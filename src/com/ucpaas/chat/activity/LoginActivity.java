@@ -56,6 +56,11 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		mEtUserPwd = (EditText) findViewById(R.id.et_login_pwd);
 		mTvAppVersion = (TextView) findViewById(R.id.tv_app_version);
 
+		String userName = SpOperation.getUserId(this);
+		if (!TextUtils.isEmpty(userName)) {
+			mEtUserName.setText(userName);
+		}
+
 		TextView btnLogin = (TextView) findViewById(R.id.tv_login_login);
 		ImageView ivRegister = (ImageView) findViewById(R.id.iv_login_register);
 		btnLogin.setOnClickListener(this);
@@ -146,8 +151,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		// TODO Auto-generated method stub
 		ToastUtil.show(LoginActivity.this, "登录成功");
 		saveUserInfo(userInfo);
-		
-		Intent intent = new Intent(LoginActivity.this, TestApiActivity.class);
+
+		Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
 		intent.putExtra("userInfo", userInfo);
 		startActivity(intent);
 		finish();

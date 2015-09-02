@@ -5,7 +5,7 @@
     android:versionName="1.0.1" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="9"
         android:targetSdkVersion="21" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -20,6 +20,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -55,13 +56,17 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.ucpaas.chat.activity.TestApiActivity"
+            android:name="com.ucpaas.chat.activity.HomeActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+         <activity
+            android:name="com.ucpaas.chat.activity.ConversationActivity"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait" >
         </activity>
 
         <service android:name="com.yzxtcp.service.YzxIMCoreService" >
         </service>
-
         <receiver android:name="com.yzxtcp.tools.tcp.receiver.AlarmReceiver" >
         </receiver>
         <receiver android:name="com.yzxtcp.tools.tcp.receiver.MsgBackReceiver" >

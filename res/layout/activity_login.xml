@@ -53,7 +53,7 @@
                     android:layout_marginLeft="10dip"
                     android:background="@null"
                     android:hint="@string/login_admin"
-                    android:inputType="textNoSuggestions"
+                    android:inputType="phone"
                     android:text=""
                     android:textColor="@color/black_text"
                     android:textColorHint="@color/gray_text" />
