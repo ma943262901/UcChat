@@ -3,16 +3,20 @@ package com.ucpaas.chat.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ucpaas.chat.R;
+import com.ucpaas.chat.base.BaseActivity;
+import com.ucpaas.chat.base.BaseApplication;
+import com.ucpaas.chat.support.SpOperation;
+import com.ucpaas.chat.util.ToastUtil;
+import com.yzxtcp.data.UcsReason;
+import com.yzxtcp.listener.ILoginListener;
+
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import com.ucpaas.chat.R;
-import com.ucpaas.chat.base.BaseActivity;
-import com.ucpaas.chat.util.ToastUtil;
 
 /**
  * 接口测试
@@ -60,6 +64,8 @@ public class TestApiActivity extends BaseActivity implements OnItemClickListener
 	public void afterInitView() {
 		// TODO Auto-generated method stub
 		setTitle("接口测试");
+
+		connectServer();
 	}
 
 	@Override
@@ -74,12 +80,37 @@ public class TestApiActivity extends BaseActivity implements OnItemClickListener
 		ToastUtil.show(TestApiActivity.this, "position:" + position);
 		switch (position) {
 		case 0:
-
 			break;
 
 		default:
 			break;
 		}
+	}
+
+	/**
+	 * 连接服务器
+	 */
+	private void connectServer() {
+		String token = SpOperation.getToken(this);
+		BaseApplication.getInstance().connectUCSManager(token, new ILoginListener() {
+
+			@Override
+			public void onLogin(final UcsReason arg0) {
+				// TODO Auto-generated method stub
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						if (arg0.getReason() == 0) {
+							ToastUtil.show(TestApiActivity.this, "连接服务器成功");
+						} else {
+							ToastUtil.show(TestApiActivity.this, "连接服务器失败");
+						}
+					}
+
+				});
+
+			}
+		});
 	}
 
 	/**

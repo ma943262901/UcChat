@@ -13,7 +13,9 @@ import com.squareup.okhttp.Request;
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.base.BaseActivity;
 import com.ucpaas.chat.bean.UserInfo;
-import com.ucpaas.chat.db.RequestFactory;
+import com.ucpaas.chat.config.ResultCode;
+import com.ucpaas.chat.support.RequestFactory;
+import com.ucpaas.chat.support.SpOperation;
 import com.ucpaas.chat.util.JSONUtils;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.OkHttpClientManager;
@@ -126,10 +128,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				// TODO Auto-generated method stub
 				UserInfo userInfo = JSONUtils.parseObject(response, UserInfo.class);
 				LogUtil.log("response:" + response);
-				LogUtil.log("userInfo:" + userInfo.toString());
 
-				if (userInfo.getResult() == 0) {
-					loginSuccess();
+				if (ResultCode.OK.equals(userInfo.getResult())) {
+					loginSuccess(userInfo);
 				} else {
 					ToastUtil.show(LoginActivity.this, "手机号无效，请先注册");
 					loginFailure();
@@ -141,10 +142,13 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	/**
 	 * 登录成功
 	 */
-	private void loginSuccess() {
+	private void loginSuccess(UserInfo userInfo) {
 		// TODO Auto-generated method stub
 		ToastUtil.show(LoginActivity.this, "登录成功");
+		saveUserInfo(userInfo);
+		
 		Intent intent = new Intent(LoginActivity.this, TestApiActivity.class);
+		intent.putExtra("userInfo", userInfo);
 		startActivity(intent);
 		finish();
 	}
@@ -155,6 +159,13 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	private void loginFailure() {
 		// TODO Auto-generated method stub
 
+	}
+
+	/**
+	 * 保存用户信息
+	 */
+	private void saveUserInfo(UserInfo userInfo) {
+		SpOperation.saveUserInfo(LoginActivity.this, userInfo);
 	}
 
 	/**

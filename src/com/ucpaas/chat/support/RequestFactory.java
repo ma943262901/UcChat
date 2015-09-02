@@ -1,4 +1,4 @@
-package com.ucpaas.chat.db;
+package com.ucpaas.chat.support;
 
 import java.util.HashMap;
 
@@ -7,7 +7,7 @@ import com.ucpaas.chat.util.OkHttpClientManager;
 import com.ucpaas.chat.util.StringUtils;
 
 /**
- * 请求工厂
+ * 请求工厂类
  * 
  * @author tangqi
  * @date 2015年9月1日下午11:11:36

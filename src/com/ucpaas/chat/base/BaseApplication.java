@@ -3,6 +3,10 @@ package com.ucpaas.chat.base;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.yzxIM.IMManager;
+import com.yzxtcp.UCSManager;
+import com.yzxtcp.listener.ILoginListener;
+
 import android.app.Activity;
 import android.app.Application;
 
@@ -18,7 +22,11 @@ public class BaseApplication extends Application {
 	private static BaseApplication mInstance;
 	private List<Activity> mActivities = new ArrayList<Activity>();
 
-	// 单例模式中获取唯一的ExitApplication 实例
+	/**
+	 * 单例模式中获取唯一的Application实例
+	 * 
+	 * @return
+	 */
 	public static BaseApplication getInstance() {
 		if (null == mInstance) {
 			mInstance = new BaseApplication();
@@ -34,12 +42,39 @@ public class BaseApplication extends Application {
 		init();
 	}
 
+	/**
+	 * 初始化
+	 */
 	private void init() {
 		// TODO Auto-generated method stub
+		initUCService();
 		initImageLoader();
-
-		// 使用腾讯BUGLY上传崩溃信息
 		initCrashReport();
+	}
+
+	/**
+	 * 初始化云之讯服务
+	 */
+	private void initUCService() {
+		UCSManager.init(this);// 初始化核心服务
+		IMManager.getInstance(this);// 必须要加上
+	}
+
+	/**
+	 * 登录UCS服务器
+	 * 
+	 * @param token
+	 * @param loginListener
+	 */
+	public void connectUCSManager(String token, ILoginListener loginListener) {
+		UCSManager.connect(token, loginListener);
+	}
+
+	/**
+	 * 注销登录UCS服务器
+	 */
+	public void disconnectUCSManager() {
+		UCSManager.disconnect();
 	}
 
 	/**
@@ -54,6 +89,7 @@ public class BaseApplication extends Application {
 	 */
 	@SuppressWarnings("unused")
 	private void initCrashHandler() {
+
 	}
 
 	/**

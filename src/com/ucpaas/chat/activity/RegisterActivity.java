@@ -9,7 +9,8 @@ import com.squareup.okhttp.Request;
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.base.BaseActivity;
 import com.ucpaas.chat.bean.UserInfo;
-import com.ucpaas.chat.db.RequestFactory;
+import com.ucpaas.chat.config.ResultCode;
+import com.ucpaas.chat.support.RequestFactory;
 import com.ucpaas.chat.util.JSONUtils;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.OkHttpClientManager;
@@ -103,9 +104,8 @@ public class RegisterActivity extends BaseActivity {
 			public void onResponse(String response) {
 				UserInfo userInfo = JSONUtils.parseObject(response, UserInfo.class);
 				LogUtil.log("response:" + response);
-				LogUtil.log("userInfo:" + userInfo.toString());
 
-				if (userInfo.getResult() == 0) {
+				if (ResultCode.OK.equals(userInfo.getResult())) {
 					registerSuccess(userInfo);
 				} else {
 					ToastUtil.show(RegisterActivity.this, "注册失败，请输入正确的手机号");

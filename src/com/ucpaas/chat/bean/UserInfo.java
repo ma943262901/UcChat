@@ -7,19 +7,21 @@ package com.ucpaas.chat.bean;
  * @date 2015年8月31日下午11:43:12
  */
 
-public class UserInfo {
+public class UserInfo extends BaseEntity{
 	
-	private int result;
+	private static final long serialVersionUID = -4720419100349025078L;
+	
+	private String result;
 	private String phone;
 	private String imtoken;
 	private String nickname;
 	private String portraituri;
 
-	public int getResult() {
+	public String getResult() {
 		return result;
 	}
 
-	public void setResult(int result) {
+	public void setResult(String result) {
 		this.result = result;
 	}
 
