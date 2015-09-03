@@ -68,6 +68,10 @@
             android:name="com.ucpaas.chat.activity.DiscussionActivity"
             android:screenOrientation="portrait" >
         </activity>
+          <activity
+            android:name="com.ucpaas.chat.activity.ImageActivity"
+            android:screenOrientation="portrait" >
+        </activity>
 
         <service android:name="com.yzxtcp.service.YzxIMCoreService" >
         </service>

@@ -208,6 +208,22 @@ public class ConversationActivity extends Activity implements MessageListener,
 	public void onReceiveMessage(final List arg0) {
 		// TODO Auto-generated method stub
 		LogUtil.log("onReceiveMessage:" + arg0.size());
+		LogUtil.log("onReceiveMessage arg0.get(0):" + ((ChatMessage)arg0.get(0)).getMsgType());
+		
+		if(MSGTYPE.MSG_DATA_TEXT == ((ChatMessage)arg0.get(0)).getMsgType()){
+			LogUtil.log("onReceiveMessage MSG_DATA_TEXT");
+		}else if(MSGTYPE.MSG_DATA_IMAGE == ((ChatMessage)arg0.get(0)).getMsgType()){
+			LogUtil.log("onReceiveMessage MSG_DATA_IMAGE");
+		}else if(MSGTYPE.MSG_DATA_VOICE == ((ChatMessage)arg0.get(0)).getMsgType()){
+			LogUtil.log("onReceiveMessage MSG_DATA_VOIC");
+		}else if(MSGTYPE.MSG_DATA_VIDEO == ((ChatMessage)arg0.get(0)).getMsgType()){
+			LogUtil.log("onReceiveMessage MSG_DATA_VIDEO");
+		}else if(MSGTYPE.MSG_DATA_SYSTEM == ((ChatMessage)arg0.get(0)).getMsgType()){
+			LogUtil.log("onReceiveMessage MSG_DATA_SYSTEM");
+		}else if(MSGTYPE.MSG_DATA_NONE == ((ChatMessage)arg0.get(0)).getMsgType()){
+			LogUtil.log("onReceiveMessage MSG_DATA_NONE");
+		}
+		
 		mChatMessages.addAll(arg0);
 		runOnUiThread(new Runnable() {
 
