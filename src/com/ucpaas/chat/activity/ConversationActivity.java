@@ -122,6 +122,16 @@ public class ConversationActivity extends Activity implements MessageListener {
 		mSwipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
 			@Override
 			public void onRefresh() {
+				
+				mHandler.postDelayed(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						mSwipeRefreshLayout.setRefreshing(false);
+					}
+				}, 2000);
+
 				// sync();
 			}
 		});

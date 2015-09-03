@@ -127,7 +127,6 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 							ToastUtil.show(HomeActivity.this, "连接服务器失败");
 						}
 					}
-
 				});
 
 			}
@@ -140,7 +139,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 
 		// 把cinfo添加到会话列表中，更新界面
 		mConversationLists.add(cinfo);
-		// mAdapter.notifyDataSetChanged();
+		sync();
 	}
 
 	@Override
@@ -149,14 +148,48 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 
 		// 把cinfo从会话列表中移除，更新界面
 		mConversationLists.remove(cinfo);
-		// mAdapter.notifyDataSetChanged();
+		sync();
+
 	}
 
 	@Override
 	public void onUpdateConversation(ConversationInfo cinfoSrc) {
 		// TODO Auto-generated method stub
 		// updataCinfo(cinfoSrc, cinfoDest);
+		updateCinfo(cinfoSrc);
+	}
 
+	private void sync() {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				mAdapter.notifyDataSetChanged();
+			}
+		});
+	}
+
+	private void updateCinfo(ConversationInfo cinfoSrc) {
+		if (mConversationLists != null && cinfoSrc != null) {
+			int findNum = -1;
+			int size = mConversationLists.size();
+			for (int i = 0; i < size; i++) {
+				ConversationInfo conversationInfo = mConversationLists.get(i);
+				if(cinfoSrc.getTargetId().equals(conversationInfo.getTargetId())){
+					findNum = i;
+					break;
+				}
+			}
+			
+			if(findNum != -1){
+				mConversationLists.set(findNum, cinfoSrc);
+			}else{
+				mConversationLists.add(0,cinfoSrc);
+			}
+			
+			sync();
+		}
 	}
 
 	private void updataCinfo(ConversationInfo cinfoSrc, ConversationInfo cinfoDest) {
