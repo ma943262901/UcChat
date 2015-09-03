@@ -3,7 +3,7 @@
 
     <string name="app_name">UcChat</string>
     <string name="action_settings">Settings</string>
-    <string name="login_admin">手机号</string>
+    <string name="login_admin">请输入手机号</string>
     <string name="login_pwd">密码可为空</string>
     <string name="login_nickname">英文昵称</string>
     <string name="login_login">登录</string>

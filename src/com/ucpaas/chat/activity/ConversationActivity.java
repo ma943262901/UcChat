@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.support.SpOperation;
+import com.ucpaas.chat.support.UcUtils;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.ToastUtil;
 import com.yzxIM.IMManager;
@@ -88,7 +89,7 @@ public class ConversationActivity extends Activity implements MessageListener {
 
 	private void initView() {
 		TextView mTitleView = (TextView) findViewById(R.id.tv_title);
-		mTitleView.setText(mConversationInfo.getTargetId());
+		mTitleView.setText(mConversationInfo.getConversationTitle());
 
 		ImageView mBackBtn = (ImageView) findViewById(R.id.btn_back);
 		mBackBtn.setVisibility(View.VISIBLE);
@@ -122,9 +123,9 @@ public class ConversationActivity extends Activity implements MessageListener {
 		mSwipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				
+
 				mHandler.postDelayed(new Runnable() {
-					
+
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub

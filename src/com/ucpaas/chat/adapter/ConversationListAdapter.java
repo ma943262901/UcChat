@@ -13,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.ucpaas.chat.R;
+import com.ucpaas.chat.util.DateUtil;
 import com.ucpaas.chat.view.CircleImageView;
 import com.yzxIM.data.db.ChatMessage;
 import com.yzxIM.data.db.ConversationInfo;
@@ -54,6 +55,7 @@ public class ConversationListAdapter extends BaseAdapter {
 
 	@SuppressLint("InflateParams")
 	public View getView(int position, View convertView, ViewGroup parent) {
+		ConversationInfo conversationInfo = getItem(position);
 		ViewHolder holder = null;
 		if (convertView == null) {
 			convertView = LayoutInflater.from(context).inflate(R.layout.listitem_conversation, null);
@@ -61,16 +63,19 @@ public class ConversationListAdapter extends BaseAdapter {
 			holder.image = (CircleImageView) convertView.findViewById(R.id.imv_conversation);
 			holder.tvTitle = (TextView) convertView.findViewById(R.id.tv_conversation_title);
 			holder.tvDesc = (TextView) convertView.findViewById(R.id.tv_conversation_desc);
+			holder.tvLastTime = (TextView) convertView.findViewById(R.id.tv_last_time);
 
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		holder.tvTitle.setText(getItem(position).getTargetId());
+		holder.tvTitle.setText(conversationInfo.getConversationTitle());
+		holder.tvLastTime.setText(DateUtil.format(DateUtil.MMDD_HHMM, conversationInfo.getLastTime()));
+
 		List<ChatMessage> currentMsgList = new ArrayList<ChatMessage>();
 		try {
-			currentMsgList = getItem(position).getLastestMessages(0, 1);
+			currentMsgList = conversationInfo.getLastestMessages(0, 1);
 			String lastMessage = currentMsgList.get(0).getContent();
 			if (!TextUtils.isEmpty(lastMessage)) {
 				holder.tvDesc.setText(lastMessage);
@@ -84,7 +89,7 @@ public class ConversationListAdapter extends BaseAdapter {
 
 	static class ViewHolder {
 		CircleImageView image;
-		TextView tvTitle, tvDesc;
+		TextView tvTitle, tvDesc, tvLastTime;
 	}
 
 }

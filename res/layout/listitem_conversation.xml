@@ -13,9 +13,10 @@
         android:src="@drawable/ic_default" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dip"
         android:layout_height="match_parent"
         android:layout_marginLeft="10dip"
+        android:layout_weight="1"
         android:gravity="center_vertical"
         android:orientation="vertical" >
 
@@ -38,5 +39,14 @@
             android:textColor="@color/gray_text"
             android:textSize="@dimen/desc_size" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_last_time"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:text="09-03 22:07"
+        android:textColor="@color/gray_text"
+        android:textSize="@dimen/desc_size" />
 
 </LinearLayout>
