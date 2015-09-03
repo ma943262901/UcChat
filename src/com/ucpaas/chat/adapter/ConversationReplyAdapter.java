@@ -122,7 +122,7 @@ public class ConversationReplyAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 					Intent intent = new Intent(mContext, ImageActivity.class);
-					intent.putExtra("url", chatMessage.getPath());
+					intent.putExtra("chatMessage", chatMessage);
 					mContext.startActivity(intent);
 				}
 			});

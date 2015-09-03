@@ -1,7 +1,5 @@
 package com.ucpaas.chat.activity;
 
-import java.io.File;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -20,7 +18,9 @@ import com.ucpaas.chat.R;
 import com.ucpaas.chat.util.FileUtils;
 import com.ucpaas.chat.util.HttpUtil;
 import com.ucpaas.chat.util.ImageLoaderUtils;
+import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.ToastUtil;
+import com.yzxIM.data.db.ChatMessage;
 
 /**
  * 2014/8/13 显示图片的界面
@@ -32,6 +32,7 @@ import com.ucpaas.chat.util.ToastUtil;
 public class ImageActivity extends Activity {
 
 	private String url; // 图片地址
+	private ChatMessage chatMessage; // 图片地址
 
 	private GestureImageView imageView; // 图片组件
 	private ProgressBar progressBar; // 进度条
@@ -47,7 +48,9 @@ public class ImageActivity extends Activity {
 
 		Bundle bundle = getIntent().getExtras();
 		url = bundle.getString("url", "");
-		System.out.println("image url -->" + url);
+		chatMessage = (ChatMessage) getIntent().getParcelableExtra("chatMessage");
+		LogUtil.log("url:" + url);
+		LogUtil.log("chatMessage:" + chatMessage);
 
 		imageView = (GestureImageView) findViewById(R.id.image);
 		progressBar = (ProgressBar) findViewById(R.id.loading);
@@ -70,8 +73,22 @@ public class ImageActivity extends Activity {
 			}
 		});
 
+		if (chatMessage != null) {
+			url = chatMessage.getPath();
+			if (url.contains("http")) {
+				// 消息接收方从网络取图片
+				new MainTask().execute(url);
+			} else {
+				// 消息发送方从本地取图片
+				ImageLoaderUtils.displaySdcardImg(chatMessage.getPath(), imageView);
+				progressBar.setVisibility(View.GONE);
+			}
+		} else {
+			// 普通下载
+			new MainTask().execute(url);
+		}
+
 		// loadImage();
-		new MainTask().execute(url);
 	}
 
 	private void saveImage() {
