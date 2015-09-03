@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="30dip"
+            android:layout_marginTop="50dip"
             android:background="@drawable/login_logo" />
 
         <LinearLayout
@@ -64,12 +64,14 @@
                 android:layout_height="1dip"
                 android:layout_marginLeft="10dip"
                 android:layout_marginRight="10dip"
-                android:background="@color/line" />
+                android:background="@color/line"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="horizontal"
+                android:visibility="gone" >
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -98,35 +100,43 @@
             android:id="@+id/tv_login_login"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="10dip"
             android:layout_marginLeft="20dip"
             android:layout_marginRight="20dip"
             android:layout_marginTop="20dip"
             android:background="@drawable/login_login"
             android:clickable="false"
             android:gravity="center"
+            android:padding="10dip"
             android:text="@string/login_login"
             android:textColor="@color/white"
             android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1" 
+        android:gravity="bottom"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/iv_login_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dip"
+            android:layout_marginBottom="20dip"
+            android:layout_gravity="center_horizontal"
             android:src="@drawable/login_register" />
-    </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_app_version"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_marginBottom="20dip"
-        android:layout_weight="1"
-        android:clickable="false"
-        android:gravity="bottom|center_horizontal"
-        android:text="当前版本V1.0"
-        android:textColor="#989898"
-        android:textSize="15sp" />
+        <TextView
+            android:id="@+id/tv_app_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dip"
+            android:clickable="false"
+            android:gravity="bottom|center_horizontal"
+            android:text="当前版本V1.0"
+            android:textColor="#989898"
+            android:textSize="15sp" />
+    </LinearLayout>
 
 </LinearLayout>

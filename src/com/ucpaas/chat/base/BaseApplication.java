@@ -3,6 +3,12 @@ package com.ucpaas.chat.base;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
+import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.utils.L;
 import com.yzxIM.IMManager;
 import com.yzxtcp.UCSManager;
 import com.yzxtcp.listener.ILoginListener;
@@ -81,7 +87,14 @@ public class BaseApplication extends Application {
 	 * 初始化ImageLoader
 	 */
 	private void initImageLoader() {
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+				.threadPriority(Thread.NORM_PRIORITY - 2).threadPoolSize(5).memoryCache(new WeakMemoryCache())
+				.denyCacheImageMultipleSizesInMemory().writeDebugLogs().memoryCacheSize(1024 * 1024 * 2)
+				.diskCacheFileNameGenerator(new HashCodeFileNameGenerator())
+				.defaultDisplayImageOptions(DisplayImageOptions.createSimple()).build();
 
+		ImageLoader.getInstance().init(config);
+		L.writeLogs(true);
 	}
 
 	/**

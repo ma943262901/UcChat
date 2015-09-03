@@ -61,6 +61,8 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 		// TODO Auto-generated method stub
 		mListView = (ListView) findViewById(R.id.lv_home);
 		mListView.setOnItemClickListener(this);
+		
+		findViewById(R.id.btn_test).setOnClickListener(this);
 	}
 
 	@Override
@@ -77,7 +79,15 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 	@Override
 	public void onViewClick(View v) {
 		// TODO Auto-generated method stub
+		switch (v.getId()) {
+		case R.id.btn_test:
+			Intent intent = new Intent(this, DiscussionActivity.class);
+			startActivity(intent);
+			break;
 
+		default:
+			break;
+		}
 	}
 
 	@Override
