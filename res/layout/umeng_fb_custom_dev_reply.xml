@@ -55,6 +55,12 @@
             android:paddingTop="12dp"
             android:textColor="#eeeeee"
             android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/img_small_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_default" />
     </LinearLayout>
 
     <TextView

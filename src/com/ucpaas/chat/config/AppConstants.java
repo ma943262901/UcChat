@@ -23,5 +23,6 @@ public class AppConstants {
 	 * 用户登录
 	 */
 	public static final String ACTION_USER_LOGIN = "/user/login.do";
+	
 
 }

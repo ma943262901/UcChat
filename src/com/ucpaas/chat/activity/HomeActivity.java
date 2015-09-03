@@ -71,6 +71,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 
 		connectServer();
 		initIMManger();
+		
 	}
 
 	@Override
@@ -105,7 +106,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 			mListView.setAdapter(mAdapter);
 		}
 
-		// sendMessage();
+		 sendMessage();
 	}
 
 	/**
@@ -211,7 +212,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 		ChatMessage msg = null;
 		msg = new SingleChat();// 创建单聊消息
 		msg.setTargetId("15019288493");
-		msg.setSenderId("13632809278");
+		msg.setSenderId("15019288493");
 		msg.setMsgType(MSGTYPE.MSG_DATA_TEXT);// 设置消息类型为文本
 		msg.setContent("石头你好"); // 设置消息内容
 		LogUtil.log("sendMessage");

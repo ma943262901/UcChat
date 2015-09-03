@@ -1,31 +1,36 @@
 package com.ucpaas.chat.activity;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.text.Editable;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ucpaas.chat.R;
+import com.ucpaas.chat.adapter.ConversationReplyAdapter;
+import com.ucpaas.chat.config.AppConstants;
 import com.ucpaas.chat.support.SpOperation;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.ToastUtil;
@@ -40,23 +45,21 @@ import com.yzxIM.listener.MessageListener;
  * 自定义反馈界面
  * 
  * @author tangqi
- *
+ * 
  */
 @SuppressLint({ "InflateParams", "SimpleDateFormat" })
-public class ConversationActivity extends Activity implements MessageListener {
+public class ConversationActivity extends Activity implements MessageListener,
+		OnClickListener {
 
 	private IMManager mIMManager;
 	private ConversationInfo mConversationInfo;
 	private List<ChatMessage> mChatMessages;
 	private ListView mListView;
 	private Context mContext;
-	private ReplyAdapter mAdapter;
-	private Button mSendBtn;
-	private EditText mInputEdit;
+	private ConversationReplyAdapter mAdapter;
+
 	private SwipeRefreshLayout mSwipeRefreshLayout;
-	private final int VIEW_TYPE_COUNT = 2;
-	private final int VIEW_TYPE_USER = 0;
-	private final int VIEW_TYPE_DEV = 1;
+
 	private String mUserId;
 
 	@SuppressLint("HandlerLeak")
@@ -70,17 +73,19 @@ public class ConversationActivity extends Activity implements MessageListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_conversation);
+		setContentView(R.layout.activity_conversation_ex);
 		mContext = this;
 
 		mIMManager = IMManager.getInstance(this); // 获得IMManager类
 		mIMManager.setSendMsgListener(this);
-		mConversationInfo = (ConversationInfo) getIntent().getSerializableExtra("conversation");
+		mConversationInfo = (ConversationInfo) getIntent()
+				.getSerializableExtra("conversation");
 		mChatMessages = mConversationInfo.getAllMessage();
 		mUserId = SpOperation.getUserId(this);
 
 		initView();
-		mAdapter = new ReplyAdapter();
+		mAdapter = new ConversationReplyAdapter(ConversationActivity.this,
+				mChatMessages);
 		mListView.setAdapter(mAdapter);
 		sync();
 
@@ -102,29 +107,17 @@ public class ConversationActivity extends Activity implements MessageListener {
 		});
 
 		mListView = (ListView) findViewById(R.id.fb_reply_list);
-		mSendBtn = (Button) findViewById(R.id.fb_send_btn);
-		mInputEdit = (EditText) findViewById(R.id.fb_send_content);
+
 		// 下拉刷新组件
 		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.fb_reply_refresh);
-		mSendBtn.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				String content = mInputEdit.getText().toString();
-				mInputEdit.getEditableText().clear();
-				if (!TextUtils.isEmpty(content)) {
-					sendMessage(content);
-				}
-			}
-		});
 
 		// 下拉刷新
 		mSwipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				
+
 				mHandler.postDelayed(new Runnable() {
-					
+
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
@@ -137,8 +130,13 @@ public class ConversationActivity extends Activity implements MessageListener {
 		});
 
 		// 顶部刷新的样式
-		mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_red_light, android.R.color.holo_green_light,
-				android.R.color.holo_blue_bright, android.R.color.holo_orange_light);
+		mSwipeRefreshLayout.setColorSchemeResources(
+				android.R.color.holo_red_light,
+				android.R.color.holo_green_light,
+				android.R.color.holo_blue_bright,
+				android.R.color.holo_orange_light);
+
+		initBottonMenu();
 	}
 
 	/**
@@ -146,7 +144,7 @@ public class ConversationActivity extends Activity implements MessageListener {
 	 * 
 	 * @param content
 	 */
-	private void sendMessage(String content) {
+	private void sendTextMessage(String content) {
 		ChatMessage msg = null;
 		msg = new SingleChat();// 创建单聊消息
 		msg.setTargetId(mConversationInfo.getTargetId());
@@ -157,15 +155,47 @@ public class ConversationActivity extends Activity implements MessageListener {
 		if (mIMManager.sendmessage(msg)) { // 发送消息成功返回true
 			// 发送成功后把消息添加到消息列表中，收到消息发送回调后刷新界面
 			// ToastUtil.show(this, "消息发送成功");
-			mChatMessages.add(msg);
-			sync();
+
+		} else {
+			ToastUtil.show(this, "消息发送失败");
+		}
+	}
+
+	private void sendImageMessage(String path, String smallPath) {
+		ChatMessage msg = null;
+		msg = new SingleChat();// 创建单聊消息
+		msg.setTargetId(mConversationInfo.getTargetId());
+		msg.setSenderId(mUserId);
+		msg.setMsgType(MSGTYPE.MSG_DATA_IMAGE);
+		msg.setContent(smallPath);
+		msg.setPath(path);
+		LogUtil.log("sendMessage");
+		if (mIMManager.sendmessage(msg)) { // 发送消息成功返回true
+
+		} else {
+			ToastUtil.show(this, "消息发送失败");
+		}
+	}
+	
+	private void sendVoiceMessage(String path, String time) {
+		ChatMessage msg = null;
+		msg = new SingleChat();// 创建单聊消息
+		msg.setTargetId(mConversationInfo.getTargetId());
+		msg.setSenderId(mUserId);
+		msg.setMsgType(MSGTYPE.MSG_DATA_VOICE);
+		msg.setPath(path);
+		msg.setContent(time);
+		LogUtil.log("sendMessage");
+		if (mIMManager.sendmessage(msg)) { // 发送消息成功返回true
+
 		} else {
 			ToastUtil.show(this, "消息发送失败");
 		}
 	}
 
 	@Override
-	public void onDownloadAttachedProgress(String arg0, String arg1, int arg2, int arg3) {
+	public void onDownloadAttachedProgress(String arg0, String arg1, int arg2,
+			int arg3) {
 		// TODO Auto-generated method stub
 
 	}
@@ -193,9 +223,21 @@ public class ConversationActivity extends Activity implements MessageListener {
 	 * 发送消息-回调
 	 */
 	@Override
-	public void onSendMsgRespone(ChatMessage arg0) {
+	public void onSendMsgRespone(ChatMessage msg) {
 		// TODO Auto-generated method stub
 		LogUtil.log("onSendMsgRespone");
+
+		LogUtil.log("status = " + msg.getSendStatus());
+		int mm = msg.getSendStatus();
+		mChatMessages.add(msg);
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				sync();
+			}
+		});
 		// sync();
 	}
 
@@ -208,108 +250,163 @@ public class ConversationActivity extends Activity implements MessageListener {
 		LogUtil.log("sync mChatMessages:" + mChatMessages.size());
 	}
 
-	// adapter
-	class ReplyAdapter extends BaseAdapter {
+	private Button mSendBtn;
+	private EditText mInputEdit;
+	private RelativeLayout mBtnMore;
+	private RelativeLayout mBtnAudio;
+	private ImageView mBtnExpression;
 
-		@Override
-		public int getCount() {
-			return mChatMessages.size();
-		}
+	private LinearLayout mLayoutBottom;
+	private LinearLayout im_ll_file;
+	private LinearLayout im_ll_images;
+	private LinearLayout im_ll_more;
+	private LinearLayout im_ll_record;
+	private LinearLayout im_ll_shot;
 
-		@Override
-		public ChatMessage getItem(int arg0) {
-			return mChatMessages.get(arg0);
-		}
+	private void initBottonMenu() {
+		mLayoutBottom = (LinearLayout) findViewById(R.id.ll_bottom);
+		mBtnMore = (RelativeLayout) findViewById(R.id.im_more);
+		mBtnMore.setOnClickListener(this);
+		mBtnAudio = (RelativeLayout) findViewById(R.id.im_audio);
+		mBtnAudio.setOnClickListener(this);
+		mBtnExpression = (ImageView) findViewById(R.id.im_expression_image);
+		mBtnExpression.setOnClickListener(this);
 
-		@Override
-		public long getItemId(int arg0) {
-			return arg0;
-		}
+		im_ll_more = (LinearLayout) findViewById(R.id.im_ll_more);
+		im_ll_record = (LinearLayout) findViewById(R.id.im_ll_record);
+		im_ll_images = (LinearLayout) findViewById(R.id.im_ll_images);
+		im_ll_shot = (LinearLayout) findViewById(R.id.im_ll_shot);
+		im_ll_shot.setOnClickListener(this);
+		im_ll_file = (LinearLayout) findViewById(R.id.im_ll_file);
+		im_ll_file.setOnClickListener(this);
 
-		@Override
-		public int getViewTypeCount() {
-			// 两种不同的Tiem布局
-			return VIEW_TYPE_COUNT;
-		}
+		mSendBtn = (Button) findViewById(R.id.fb_send_btn);
+		mSendBtn.setOnClickListener(this);
+		mInputEdit = (EditText) findViewById(R.id.fb_send_content);
 
-		@Override
-		public int getItemViewType(int position) {
-			// 获取单条回复
-			ChatMessage chatMessage = getItem(position);
-			if (chatMessage.getIsFromMyself()) {
-				// 开发者回复Item布局
-				return VIEW_TYPE_DEV;
-			} else {
-				// 用户反馈、回复Item布局
-				return VIEW_TYPE_USER;
+		mInputEdit.setOnFocusChangeListener(new OnFocusChangeListener() {
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				// 隐藏其他布局
+				im_ll_more.setVisibility(View.GONE);
+				im_ll_images.setVisibility(View.GONE);
+				im_ll_record.setVisibility(View.GONE);
 			}
-		}
+		});
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			ViewHolder holder = null;
-			// 获取单条回复
-			ChatMessage chatMessage = getItem(position);
-			if (convertView == null) {
-				// 根据Type的类型来加载不同的Item布局
-				if (chatMessage.getIsFromMyself()) {
-					// 开发者的回复
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.umeng_fb_custom_dev_reply, null);
-				} else {
-					// 用户的反馈、回复
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.umeng_fb_custom_user_reply, null);
-				}
+		mInputEdit.addTextChangedListener(new TextWatcher() {
 
-				// 创建ViewHolder并获取各种View
-				holder = new ViewHolder();
-				holder.replyContent = (TextView) convertView.findViewById(R.id.fb_reply_content);
-				holder.replyProgressBar = (ProgressBar) convertView.findViewById(R.id.fb_reply_progressBar);
-				holder.replyStateFailed = (ImageView) convertView.findViewById(R.id.fb_reply_state_failed);
-				holder.replyData = (TextView) convertView.findViewById(R.id.fb_reply_date);
-				convertView.setTag(holder);
-			} else {
-				holder = (ViewHolder) convertView.getTag();
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+				// TODO Auto-generated method stub
+
 			}
 
-			// 以下是填充数据
-			// 设置Reply的内容
-			holder.replyContent.setText(chatMessage.getContent());
-
-			// 在App应用界面，对于开发者的Reply来讲status没有意义
-			if (!chatMessage.getIsFromMyself()) {
-				// 根据Reply的状态来设置replyStateFailed的状态
-				// if (Reply.STATUS_NOT_SENT.equals(reply.status)) {
-				// holder.replyStateFailed.setVisibility(View.VISIBLE);
-				// } else {
-				// holder.replyStateFailed.setVisibility(View.GONE);
-				// }
-				//
-				// // 根据Reply的状态来设置replyProgressBar的状态
-				// if (Reply.STATUS_SENDING.equals(reply.status)) {
-				// holder.replyProgressBar.setVisibility(View.VISIBLE);
-				// } else {
-				// holder.replyProgressBar.setVisibility(View.GONE);
-				// }
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				mSendBtn.setVisibility(View.VISIBLE);
+				mBtnMore.setVisibility(View.GONE);
 			}
 
-			// 回复的时间数据，这里仿照QQ两条Reply之间相差100000ms则展示时间
-			if ((position + 1) < getCount()) {
-				ChatMessage nextChatMessage = getItem(position + 1);
-				if (nextChatMessage.getSendTime() - chatMessage.getSendTime() > 100000) {
-					Date replyTime = new Date(chatMessage.getSendTime());
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					holder.replyData.setText(sdf.format(replyTime));
-					holder.replyData.setVisibility(View.VISIBLE);
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (mSendBtn.getVisibility() != View.VISIBLE) {
+					mSendBtn.setVisibility(View.VISIBLE);
+					mBtnMore.setVisibility(View.GONE);
 				}
 			}
-			return convertView;
-		}
+		});
+	}
 
-		class ViewHolder {
-			TextView replyContent;
-			ProgressBar replyProgressBar;
-			ImageView replyStateFailed;
-			TextView replyData;
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		// 发送文本/表情消息
+		case R.id.fb_send_btn: {
+			String content = mInputEdit.getText().toString();
+			mInputEdit.getEditableText().clear();
+			if (!TextUtils.isEmpty(content)) {
+				sendTextMessage(content);
+			}
+			if (mSendBtn.getVisibility() == View.VISIBLE) {
+				mSendBtn.setVisibility(View.GONE);
+				mBtnMore.setVisibility(View.VISIBLE);
+			}
+
+		}
+			break;
+		// 语音按钮
+		case R.id.im_audio: {
+			if (im_ll_record.getVisibility() == View.VISIBLE) {
+				im_ll_record.setVisibility(View.GONE);
+			} else {
+				im_ll_more.setVisibility(View.GONE);
+				im_ll_images.setVisibility(View.GONE);
+				im_ll_record.setVisibility(View.VISIBLE);
+			}
+		}
+			break;
+		// 表情按钮
+		case R.id.im_expression_image: {
+			if (im_ll_images.getVisibility() == View.VISIBLE) {
+				im_ll_images.setVisibility(View.GONE);
+			} else {
+				im_ll_more.setVisibility(View.GONE);
+				im_ll_record.setVisibility(View.GONE);
+				im_ll_images.setVisibility(View.VISIBLE);
+			}
+		}
+			break;
+		// 更多按钮
+		case R.id.im_more: {
+			if (im_ll_more.getVisibility() == View.VISIBLE) {
+				im_ll_more.setVisibility(View.GONE);
+			} else {
+				im_ll_record.setVisibility(View.GONE);
+				im_ll_images.setVisibility(View.GONE);
+				im_ll_more.setVisibility(View.VISIBLE);
+			}
+
+		}
+			break;
+		// 图片
+		case R.id.im_ll_file: {
+			Intent intent = new Intent(
+					Intent.ACTION_PICK,
+					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			startActivityForResult(intent, 1);
+		}
+			break;
+		default:
+			break;
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			String path = null;
+			Uri uri = data.getData();
+			Cursor cursor = this.getContentResolver().query(uri, null, null,
+					null, null);
+			cursor.moveToFirst();
+			for (int i = 0; i < cursor.getColumnCount(); i++) {// 取得图片uri的列名和此列的详细信息
+																// String str =
+																// i + "-" +
+																// cursor.getColumnName(i)
+																// + "-" +
+																// cursor.getString(i);
+				// System.out.println(i + "-" + cursor.getColumnName(i) + "-" +
+				// cursor.getString(i));
+				int index = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+				path = cursor.getString(index);				
+			}
+			if (path != null) {
+				sendImageMessage(path, path);
+			}
 		}
 	}
 
