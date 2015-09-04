@@ -19,7 +19,7 @@ import com.yzxIM.data.db.ChatMessage;
 import com.yzxIM.data.db.ConversationInfo;
 
 /**
- * 博主列表
+ * 会话列表
  * 
  * @author tangqi
  * @data 2015年8月9日下午2:01:25

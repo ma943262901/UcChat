@@ -61,7 +61,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 		// TODO Auto-generated method stub
 		mListView = (ListView) findViewById(R.id.lv_home);
 		mListView.setOnItemClickListener(this);
-		
+
 		findViewById(R.id.btn_test).setOnClickListener(this);
 	}
 
@@ -73,7 +73,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 
 		connectServer();
 		initIMManger();
-		
+
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 			mListView.setAdapter(mAdapter);
 		}
 
-		 sendMessage();
+		// sendMessage();
 	}
 
 	/**
@@ -187,18 +187,18 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener, I
 			int size = mConversationLists.size();
 			for (int i = 0; i < size; i++) {
 				ConversationInfo conversationInfo = mConversationLists.get(i);
-				if(cinfoSrc.getTargetId().equals(conversationInfo.getTargetId())){
+				if (cinfoSrc.getTargetId().equals(conversationInfo.getTargetId())) {
 					findNum = i;
 					break;
 				}
 			}
-			
-			if(findNum != -1){
+
+			if (findNum != -1) {
 				mConversationLists.set(findNum, cinfoSrc);
-			}else{
-				mConversationLists.add(0,cinfoSrc);
+			} else {
+				mConversationLists.add(0, cinfoSrc);
 			}
-			
+
 			sync();
 		}
 	}
