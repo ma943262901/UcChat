@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ucpaas.chat.R;
+import com.ucpaas.chat.util.ImageLoaderUtils;
 import com.yzxIM.data.MSGTYPE;
 import com.yzxIM.data.db.ChatMessage;
 
@@ -114,8 +115,9 @@ public class ConversationReplyAdapter extends BaseAdapter {
 			holder.replyImgSmall.setVisibility(View.GONE);
 		}else if(chatMessage.getMsgType() == MSGTYPE.MSG_DATA_IMAGE){
 			holder.replyContent.setText(chatMessage.getContent());
-			holder.replyContent.setVisibility(View.VISIBLE);
-			holder.replyImgSmall.setVisibility(View.GONE);
+			holder.replyContent.setVisibility(View.GONE);
+			holder.replyImgSmall.setVisibility(View.VISIBLE);
+			ImageLoaderUtils.displayImg(chatMessage.getPath(), holder.replyImgSmall);
 		}else if(chatMessage.getMsgType() == MSGTYPE.MSG_DATA_VOICE){
 			holder.replyContent.setText(chatMessage.getContent());
 			holder.replyContent.setVisibility(View.VISIBLE);
