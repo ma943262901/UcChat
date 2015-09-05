@@ -291,7 +291,7 @@
             android:layout_height="fill_parent"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
-            android:visibility="gone" >
+            android:visibility="visible" >
 
             <TextView
                 android:id="@+id/im_tv_record"
@@ -324,7 +324,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="35.0dip"
                     android:layout_marginRight="35.0dip"
-                    android:background="@drawable/im_record" />
+                    android:background="@drawable/im_record_sel" />
 
                 <ImageView
                     android:id="@+id/im_iv_record_right"

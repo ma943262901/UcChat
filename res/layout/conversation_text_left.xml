@@ -42,12 +42,6 @@
                 android:textSize="14sp" />
 
             <ImageView
-                android:id="@+id/img_small_pic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_default" />
-
-            <ImageView
                 android:id="@+id/fb_reply_state_failed"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
