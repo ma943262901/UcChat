@@ -20,6 +20,8 @@ import com.ucpaas.chat.base.BaseFragment;
 
 public class MeFragment extends BaseFragment implements OnClickListener {
 
+	private View rootView;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -29,13 +31,21 @@ public class MeFragment extends BaseFragment implements OnClickListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		View view = inflater.inflate(R.layout.fragment_me, container, false);
-		initView(view);
-		return view;
+		if (rootView == null) {
+			rootView = inflater.inflate(R.layout.fragment_me, container, false);
+		}
+		ViewGroup parent = (ViewGroup) rootView.getParent();
+		if (parent != null) {
+			parent.removeView(rootView);
+		}
+
+		initView(rootView);
+		return rootView;
 	}
 
 	private void initView(View view) {
 		// TODO Auto-generated method stub
+		hideBackButton(view);
 		TextView mTitleView = (TextView) view.findViewById(R.id.tv_title);
 		mTitleView.setText(R.string.user_center);
 

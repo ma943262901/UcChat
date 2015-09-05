@@ -26,4 +26,6 @@
         android:listSelector="@drawable/selector_text_bg_white" >
     </ListView>
 
+    <include layout="@layout/include_line_layout" />
+
 </LinearLayout>

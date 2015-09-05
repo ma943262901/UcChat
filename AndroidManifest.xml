@@ -69,7 +69,7 @@
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
-            android:name="com.ucpaas.chat.activity.DiscussionActivity"
+            android:name="com.ucpaas.chat.activity.DiscussionListActivity"
             android:screenOrientation="portrait" >
         </activity>
           <activity

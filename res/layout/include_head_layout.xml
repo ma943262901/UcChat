@@ -13,8 +13,7 @@
         android:background="@drawable/selector_btn_header"
         android:contentDescription="@null"
         android:padding="13dip"
-        android:src="@drawable/back"
-        android:visibility="gone" />
+        android:src="@drawable/back"/>
 
     <ImageView
         android:id="@+id/imv_actionbar_divider"
@@ -23,8 +22,7 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/btn_back"
         android:contentDescription="@null"
-        android:src="@drawable/base_action_bar_back_divider"
-        android:visibility="gone" />
+        android:src="@drawable/base_action_bar_back_divider"/>
 
     <TextView
         android:id="@+id/tv_title"

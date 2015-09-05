@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.base.BaseFragmentActivity;
-import com.ucpaas.chat.fragment.ChannelFragment;
+import com.ucpaas.chat.fragment.ContactFragment;
 /**
  * 主页
  * 
@@ -30,7 +30,7 @@ public class HomeActivity extends BaseFragmentActivity implements OnCheckedChang
 
 	private RadioGroup mGroup;
 	private ConversationListFragment mFirstFragment;
-	private ChannelFragment mSecondFragment;
+	private ContactFragment mSecondFragment;
 	// private FindFragment mThirdFragment;
 	private MeFragment mFourthFragment;
 
@@ -51,13 +51,15 @@ public class HomeActivity extends BaseFragmentActivity implements OnCheckedChang
 
 		mGroup = (RadioGroup) findViewById(R.id.main_radio);
 		mFirstFragment = new ConversationListFragment();
-		mSecondFragment = new ChannelFragment();
+		mSecondFragment = new ContactFragment();
 		// mThirdFragment = new FindFragment();
 		mFourthFragment = new MeFragment();
 		mFormerTag = FIRST_TAG;
 		getSupportFragmentManager().beginTransaction().add(R.id.main_content, mFirstFragment, FIRST_TAG).commit();
 
 		mGroup.setOnCheckedChangeListener(this);
+		
+		hideBackButton();
 	}
 
 	/**

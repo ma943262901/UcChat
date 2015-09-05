@@ -66,4 +66,24 @@ public class SpOperation {
 	public static String getUserId(Context context) {
 		return SpHelper.getInstance(context).get(SpKey.PHONE);
 	}
+
+	/**
+	 * 判断是否第一次登录
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static boolean getIsFirstLogin(Context context) {
+		return (Boolean) SpHelper.getInstance(context).get("isFirstLogin", true);
+	}
+
+	/**
+	 * 设置是否第一次登录
+	 * 
+	 * @param context
+	 * @param isTrue
+	 */
+	public static void setIsFirstLogin(Context context, boolean isTrue) {
+		SpHelper.getInstance(context).put("isFirstLogin", isTrue);
+	}
 }

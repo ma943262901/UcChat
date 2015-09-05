@@ -74,13 +74,12 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 			ImageView btnBack = (ImageView) findViewById(R.id.btn_back);
 			ImageView imvDivider = (ImageView) findViewById(R.id.imv_actionbar_divider);
 
-			btnBack.setVisibility(View.VISIBLE);
-			imvDivider.setVisibility(View.VISIBLE);
+			btnBack.setVisibility(View.GONE);
+			imvDivider.setVisibility(View.GONE);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -90,6 +89,7 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 		try {
 			ImageView btnMenu = (ImageView) findViewById(R.id.btn_menu);
 			btnMenu.setVisibility(View.VISIBLE);
+			btnMenu.setOnClickListener(this);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();

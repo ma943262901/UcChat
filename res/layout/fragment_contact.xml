@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/gray_bg"
+    android:orientation="vertical" >
+
+    <include
+        layout="@layout/include_head_layout"
+        android:visibility="visible" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/ll_person"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_text_bg_white"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/ll_addrs_height"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/ll_addrs_height"
+                    android:contentDescription="@null"
+                    android:padding="@dimen/padding_image"
+                    android:src="@drawable/person"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="新的朋友"
+                    android:textColor="@color/black_text"
+                    android:textSize="@dimen/content_size" />
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_line_layout"
+                android:padding="8dip" />
+
+            <LinearLayout
+                android:id="@+id/ll_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_text_bg_white"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/ll_addrs_height"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/ll_addrs_height"
+                    android:contentDescription="@null"
+                    android:padding="@dimen/padding_image"
+                    android:src="@drawable/person_group"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="群组"
+                    android:textColor="@color/black_text"
+                    android:textSize="@dimen/content_size" />
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_line_layout"
+                android:padding="8dip" />
+
+            <LinearLayout
+                android:id="@+id/ll_discussion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_text_bg_white"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/ll_addrs_height"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/ll_addrs_height"
+                    android:contentDescription="@null"
+                    android:padding="@dimen/padding_image"
+                    android:src="@drawable/person_discussion"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="讨论组"
+                    android:textColor="@color/black_text"
+                    android:textSize="@dimen/content_size" />
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_line_layout"
+                android:padding="8dip" />
+
+            <ListView
+                android:id="@+id/lv_contact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dip"
+                android:cacheColorHint="#00000000"
+                android:divider="@color/list_divider_color"
+                android:dividerHeight="0.5dip"
+                android:listSelector="@drawable/selector_text_bg_white" />
+
+            <include layout="@layout/include_line_layout" />
+        </LinearLayout>
+
+</LinearLayout>

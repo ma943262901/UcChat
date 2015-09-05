@@ -3,45 +3,63 @@ package com.ucpaas.chat.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.ucpaas.chat.R;
+import com.ucpaas.chat.adapter.GroupListAdapter;
 import com.ucpaas.chat.base.BaseActivity;
 import com.ucpaas.chat.util.LogUtil;
 import com.yzxIM.IMManager;
+import com.yzxIM.data.CategoryId;
 import com.yzxIM.data.db.ConversationInfo;
 import com.yzxIM.data.db.DiscussionInfo;
 import com.yzxIM.listener.DiscussionGroupCallBack;
 import com.yzxtcp.data.UcsReason;
 
 /**
- * 讨论组
+ * 讨论组列表
  * 
  * @author tangqi
  * @date 2015年9月3日下午3:19:23
  */
 
-public class DiscussionActivity extends BaseActivity implements OnItemClickListener, DiscussionGroupCallBack {
+public class DiscussionListActivity extends BaseActivity implements OnItemClickListener, DiscussionGroupCallBack {
 	private ListView mListView;
+	private GroupListAdapter mAdapter;
+
 	private IMManager mIMManager;
 	private DiscussionInfo mDiscussionInfo;
+	private CategoryId mCategoryId;
+	private List<ConversationInfo> mConversationLists;
 
 	@Override
 	public void setContentLayout() {
 		// TODO Auto-generated method stub
-		setContentView(R.layout.activity_discussion);
+		setContentView(R.layout.activity_discussion_list);
 	}
 
 	@Override
 	public void beforeInitView() {
 		// TODO Auto-generated method stub
+		mCategoryId = (CategoryId) getIntent().getSerializableExtra("categoryId");
 		mIMManager = IMManager.getInstance(this);
 		mIMManager.setDiscussionGroup(this);
 		mDiscussionInfo = new DiscussionInfo();
+
+		mConversationLists = new ArrayList<ConversationInfo>();
+		List<ConversationInfo> conversationLists = mIMManager.getConversationList();
+		if (conversationLists != null) {
+			for (ConversationInfo conversationInfo : conversationLists) {
+				if (CategoryId.DISCUSSION == conversationInfo.getCategoryId()) {
+					mConversationLists.add(conversationInfo);
+				}
+			}
+		}
+
 	}
 
 	@Override
@@ -50,24 +68,20 @@ public class DiscussionActivity extends BaseActivity implements OnItemClickListe
 		mListView = (ListView) findViewById(R.id.lv_discussion);
 		mListView.setOnItemClickListener(this);
 
-		mListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getData()));
-	}
-
-	private List<String> getData() {
-		// TODO Auto-generated method stub
-		List<String> list = new ArrayList<String>();
-		list.add("创建讨论组");
-		list.add("添加讨论组成员");
-		list.add("删除讨论组成员");
-		list.add("退出讨论组");
-		list.add("修改讨论组名称");
-		return list;
+		mAdapter = new GroupListAdapter(this, mConversationLists);
+		mListView.setAdapter(mAdapter);
 	}
 
 	@Override
 	public void afterInitView() {
 		// TODO Auto-generated method stub
-		setTitle("讨论组");
+		if (CategoryId.DISCUSSION.equals(mCategoryId)) {
+			setTitle("讨论组列表");
+		} else if (CategoryId.GROUP.equals(mCategoryId)) {
+			setTitle("群组列表");
+		}
+
+		showRightMenu();
 	}
 
 	@Override
@@ -79,30 +93,10 @@ public class DiscussionActivity extends BaseActivity implements OnItemClickListe
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// TODO Auto-generated method stub
-		switch (position) {
-		case 0:
-			createDiscussionGroup();
-			break;
-
-		case 1:
-			addDiscussionGroupMember();
-			break;
-
-		case 2:
-			delDiscussionGroupMember();
-			break;
-
-		case 3:
-			quitDiscussionGroup();
-			break;
-
-		case 4:
-			modifyDiscussionTitle();
-			break;
-
-		default:
-			break;
-		}
+		ConversationInfo conversationinfo = mConversationLists.get(position);
+		Intent intent = new Intent(this, ConversationActivity.class);
+		intent.putExtra("conversation", conversationinfo);
+		startActivity(intent);
 	}
 
 	private void createDiscussionGroup() {
@@ -112,7 +106,7 @@ public class DiscussionActivity extends BaseActivity implements OnItemClickListe
 		mIMManager.createDiscussionGroup("1363280", memberList);
 	}
 
-	private void addDiscussionGroupMember() {	
+	private void addDiscussionGroupMember() {
 		// TODO Auto-generated method stub
 		List<String> memberList = new ArrayList<String>();
 		memberList.add("15019288493");
@@ -139,7 +133,7 @@ public class DiscussionActivity extends BaseActivity implements OnItemClickListe
 	@Override
 	public void onCreateDiscussion(UcsReason reason, DiscussionInfo dInfo) {
 		// TODO Auto-generated method stub
-		LogUtil.log("onCreateDiscussion result:"+reason.getReason());
+		LogUtil.log("onCreateDiscussion result:" + reason.getReason());
 		if (reason.getReason() == 0) {
 			// 创建成功
 			ConversationInfo info = IMManager.getInstance(this).getConversation(dInfo.getDiscussionId());

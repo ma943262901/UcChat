@@ -1,7 +1,11 @@
 package com.ucpaas.chat.base;
 
+import com.ucpaas.chat.R;
+
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.widget.ImageView;
 
 /**
  * FragmentActivity-基类
@@ -29,5 +33,21 @@ public class BaseFragmentActivity extends FragmentActivity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+	}
+
+	/**
+	 * 隐藏返回按钮
+	 */
+	protected void hideBackButton() {
+		try {
+			ImageView btnBack = (ImageView) findViewById(R.id.btn_back);
+			ImageView imvDivider = (ImageView) findViewById(R.id.imv_actionbar_divider);
+
+			btnBack.setVisibility(View.GONE);
+			imvDivider.setVisibility(View.GONE);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 	}
 }

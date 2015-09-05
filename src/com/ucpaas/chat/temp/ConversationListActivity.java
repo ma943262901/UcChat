@@ -1,4 +1,4 @@
-package com.ucpaas.chat.activity;
+package com.ucpaas.chat.temp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.ucpaas.chat.R;
+import com.ucpaas.chat.activity.ConversationActivity;
+import com.ucpaas.chat.activity.DiscussionListActivity;
 import com.ucpaas.chat.adapter.ConversationListAdapter;
 import com.ucpaas.chat.base.BaseActivity;
 import com.ucpaas.chat.base.BaseApplication;
@@ -81,7 +83,7 @@ public class ConversationListActivity extends BaseActivity implements OnItemClic
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.btn_test:
-			Intent intent = new Intent(this, DiscussionActivity.class);
+			Intent intent = new Intent(this, DiscussionListActivity.class);
 			startActivity(intent);
 			break;
 

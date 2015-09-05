@@ -3,6 +3,8 @@ package com.ucpaas.chat.bean;
 
 import java.io.Serializable;
 
+import com.lidroid.xutils.db.annotation.Column;
+
 /**
  * Entity基类
  * 
@@ -14,6 +16,7 @@ public class BaseEntity implements Serializable {
 
 	private static final long serialVersionUID = -4841630499179411834L;
 	
+	@Column(column = "id")
 	private int id;
 
 	public int getId() {

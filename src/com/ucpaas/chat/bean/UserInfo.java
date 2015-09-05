@@ -1,5 +1,7 @@
 package com.ucpaas.chat.bean;
 
+import com.lidroid.xutils.db.annotation.Column;
+
 /**
  * 用户信息
  * 
@@ -11,10 +13,19 @@ public class UserInfo extends BaseEntity{
 	
 	private static final long serialVersionUID = -4720419100349025078L;
 	
+	@Column(column = "result")
 	private String result;
+	
+	@Column(column = "phone")
 	private String phone;
+	
+	@Column(column = "imtoken")
 	private String imtoken;
+	
+	@Column(column = "nickname")
 	private String nickname;
+	
+	@Column(column = "portraituri")
 	private String portraituri;
 
 	public String getResult() {

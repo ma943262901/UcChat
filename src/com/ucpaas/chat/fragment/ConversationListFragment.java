@@ -32,7 +32,8 @@ import com.yzxtcp.data.UcsReason;
 import com.yzxtcp.listener.ILoginListener;
 
 /**
- * 聊天
+ * 聊天列表
+ * 
  * @author tangqi
  * @date 2015年9月5日下午2:18:35
  */
@@ -70,6 +71,7 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 
 	private void initView(View view) {
 		// TODO Auto-generated method stub
+		hideBackButton(view);
 		TextView mTitleView = (TextView) view.findViewById(R.id.tv_title);
 		mTitleView.setText("消息");
 
