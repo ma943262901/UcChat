@@ -55,8 +55,12 @@
             android:name="com.ucpaas.chat.activity.RegisterActivity"
             android:screenOrientation="portrait" >
         </activity>
-        <activity
+            <activity
             android:name="com.ucpaas.chat.activity.HomeActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.ucpaas.chat.activity.ConversationListActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity

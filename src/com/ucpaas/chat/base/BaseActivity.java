@@ -74,8 +74,8 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 			ImageView btnBack = (ImageView) findViewById(R.id.btn_back);
 			ImageView imvDivider = (ImageView) findViewById(R.id.imv_actionbar_divider);
 
-			btnBack.setVisibility(View.GONE);
-			imvDivider.setVisibility(View.GONE);
+			btnBack.setVisibility(View.VISIBLE);
+			imvDivider.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();

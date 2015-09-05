@@ -1,251 +1,127 @@
 package com.ucpaas.chat.activity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.Toast;
 
 import com.ucpaas.chat.R;
-import com.ucpaas.chat.adapter.ConversationListAdapter;
-import com.ucpaas.chat.base.BaseActivity;
-import com.ucpaas.chat.base.BaseApplication;
-import com.ucpaas.chat.support.SpOperation;
-import com.ucpaas.chat.util.LogUtil;
-import com.ucpaas.chat.util.ToastUtil;
-import com.yzxIM.IMManager;
-import com.yzxIM.data.CategoryId;
-import com.yzxIM.data.MSGTYPE;
-import com.yzxIM.data.db.ChatMessage;
-import com.yzxIM.data.db.ConversationInfo;
-import com.yzxIM.data.db.SingleChat;
-import com.yzxIM.listener.IConversationListener;
-import com.yzxtcp.data.UcsReason;
-import com.yzxtcp.listener.ILoginListener;
-
+import com.ucpaas.chat.base.BaseFragmentActivity;
+import com.ucpaas.chat.fragment.ChannelFragment;
 /**
  * 主页
  * 
  * @author tangqi
- * @date 2015年9月1日下午10:39:18
+ * @data 2015年7月8日下午9:20:20
+ *
  */
+import com.ucpaas.chat.fragment.ConversationListFragment;
+import com.ucpaas.chat.fragment.MeFragment;
 
-public class HomeActivity extends BaseActivity implements OnItemClickListener, IConversationListener {
+/**
+ * 首页
+ * 
+ * @author smile
+ * 
+ */
+public class HomeActivity extends BaseFragmentActivity implements OnCheckedChangeListener {
 
-	private ListView mListView;
-	private IMManager mIMManager;
-	private ConversationListAdapter mAdapter;
-	private List<ConversationInfo> mConversationLists;
+	private RadioGroup mGroup;
+	private ConversationListFragment mFirstFragment;
+	private ChannelFragment mSecondFragment;
+	// private FindFragment mThirdFragment;
+	private MeFragment mFourthFragment;
 
-	private long mExitTime;
+	private String mFormerTag;
+	private final static String FIRST_TAG = "FirstFragment";
+	private final static String SECOND_TAG = "SecondFragment";
+	private final static String THIRD_TAG = "ThirdFragment";
+	private final static String FOURTH_TAG = "FourthFragment";
+
+	private long exitTime;
 	private final static long TIME_DIFF = 2 * 1000;
 
 	@Override
-	public void setContentLayout() {
+	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
-	}
 
-	@Override
-	public void beforeInitView() {
-		// TODO Auto-generated method stub
-		mConversationLists = new ArrayList<ConversationInfo>();
-	}
+		mGroup = (RadioGroup) findViewById(R.id.main_radio);
+		mFirstFragment = new ConversationListFragment();
+		mSecondFragment = new ChannelFragment();
+		// mThirdFragment = new FindFragment();
+		mFourthFragment = new MeFragment();
+		mFormerTag = FIRST_TAG;
+		getSupportFragmentManager().beginTransaction().add(R.id.main_content, mFirstFragment, FIRST_TAG).commit();
 
-	@Override
-	public void initView() {
-		// TODO Auto-generated method stub
-		mListView = (ListView) findViewById(R.id.lv_home);
-		mListView.setOnItemClickListener(this);
-
-		findViewById(R.id.btn_test).setOnClickListener(this);
-	}
-
-	@Override
-	public void afterInitView() {
-		// TODO Auto-generated method stub
-		setTitle("聊天列表");
-		hideBackButton();
-
-		connectServer();
-		initIMManger();
-
-	}
-
-	@Override
-	public void onViewClick(View v) {
-		// TODO Auto-generated method stub
-		switch (v.getId()) {
-		case R.id.btn_test:
-			Intent intent = new Intent(this, DiscussionActivity.class);
-			startActivity(intent);
-			break;
-
-		default:
-			break;
-		}
-	}
-
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		// TODO Auto-generated method stub
-		ConversationInfo conversationinfo = mConversationLists.get(position);
-		Intent intent = new Intent(this, ConversationActivity.class);
-		intent.putExtra("conversation", conversationinfo);
-		startActivity(intent);
+		mGroup.setOnCheckedChangeListener(this);
 	}
 
 	/**
-	 * 初始化IMManager
+	 * 首页导航切换
 	 */
-	private void initIMManger() {
-		// TODO Auto-generated method stub
-		mIMManager = IMManager.getInstance(this); // 获得IMManager类
-		mIMManager.setConversationListener(this);
-		mConversationLists = new ArrayList<ConversationInfo>();// 定义会话列表
-
-		// 获取会列表
-		mConversationLists = mIMManager.getConversationList();
-		LogUtil.log("conversationLists:" + mConversationLists.size());
-		if (mConversationLists != null) {
-			mAdapter = new ConversationListAdapter(this, mConversationLists);
-			mListView.setAdapter(mAdapter);
-		}
-
-		// sendMessage();
-	}
-
-	/**
-	 * 连接服务器
-	 */
-	private void connectServer() {
-		String token = SpOperation.getToken(this);
-		BaseApplication.getInstance().connectUCSManager(token, new ILoginListener() {
-
-			@Override
-			public void onLogin(final UcsReason arg0) {
-				// TODO Auto-generated method stub
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						if (arg0.getReason() == 0) {
-							ToastUtil.show(HomeActivity.this, "连接服务器成功");
-						} else {
-							ToastUtil.show(HomeActivity.this, "连接服务器失败");
-						}
-					}
-				});
-
-			}
-		});
-	}
-
 	@Override
-	public void onCreateConversation(ConversationInfo cinfo) {
+	public void onCheckedChanged(RadioGroup arg0, int checkedId) {
 		// TODO Auto-generated method stub
+		FragmentTransaction mTransaction = getSupportFragmentManager().beginTransaction();
+		mTransaction.hide(getSupportFragmentManager().findFragmentByTag(mFormerTag));
 
-		// 把cinfo添加到会话列表中，更新界面
-		mConversationLists.add(cinfo);
-		sync();
-	}
+		switch (checkedId) {
 
-	@Override
-	public void onDeleteConversation(ConversationInfo cinfo) {
-		// TODO Auto-generated method stub
-
-		// 把cinfo从会话列表中移除，更新界面
-		mConversationLists.remove(cinfo);
-		sync();
-
-	}
-
-	@Override
-	public void onUpdateConversation(ConversationInfo cinfoSrc) {
-		// TODO Auto-generated method stub
-		// updataCinfo(cinfoSrc, cinfoDest);
-		updateCinfo(cinfoSrc);
-	}
-
-	private void sync() {
-		runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				mAdapter.notifyDataSetChanged();
-			}
-		});
-	}
-
-	private void updateCinfo(ConversationInfo cinfoSrc) {
-		if (mConversationLists != null && cinfoSrc != null) {
-			int findNum = -1;
-			int size = mConversationLists.size();
-			for (int i = 0; i < size; i++) {
-				ConversationInfo conversationInfo = mConversationLists.get(i);
-				if (cinfoSrc.getTargetId().equals(conversationInfo.getTargetId())) {
-					findNum = i;
-					break;
-				}
-			}
-
-			if (findNum != -1) {
-				mConversationLists.set(findNum, cinfoSrc);
+		// 消息
+		case R.id.radiobutton_blogger:
+			mFormerTag = FIRST_TAG;
+			if (mFirstFragment.isAdded()) {
+				mTransaction.show(mFirstFragment).commit();
 			} else {
-				mConversationLists.add(0, cinfoSrc);
+				mTransaction.add(R.id.main_content, mFirstFragment, mFormerTag).commit();
 			}
+			break;
 
-			sync();
+		// 通信录
+		case R.id.radiobutton_channel:
+			mFormerTag = SECOND_TAG;
+			if (mSecondFragment.isAdded()) {
+				mTransaction.show(mSecondFragment).commit();
+			} else {
+				mTransaction.add(R.id.main_content, mSecondFragment, mFormerTag).commit();
+			}
+			break;
+
+		// 发现
+		case R.id.radiobutton_find:
+			// mFormerTag = THIRD_TAG;
+			// if (mThirdFragment.isAdded()) {
+			// mTransaction.show(mThirdFragment).commit();
+			// } else {
+			// mTransaction.add(R.id.main_content, mThirdFragment,
+			// mFormerTag).commit();
+			// }
+			break;
+
+		// 我
+		case R.id.radiobutton_me:
+			mFormerTag = FOURTH_TAG;
+			if (mFourthFragment.isAdded()) {
+				mTransaction.show(mFourthFragment).commit();
+			} else {
+				mTransaction.add(R.id.main_content, mFourthFragment, mFormerTag).commit();
+			}
+			break;
+
 		}
 	}
 
-	private void updataCinfo(ConversationInfo cinfoSrc, ConversationInfo cinfoDest) {
-		mConversationLists.remove(cinfoDest);
-		cinfoDest.setDraftMsg(cinfoSrc.getDraftMsg());
-		cinfoDest.setLastTime(cinfoSrc.getLastTime());
-		if (cinfoSrc.getCategoryId() != CategoryId.GROUP) {
-			cinfoDest.setConversationTitle(cinfoSrc.getConversationTitle());
-		}
-		if (cinfoDest.getIsTop()) {
-			mConversationLists.add(0, cinfoDest);
-		} else {
-			// conversationLists.add(topNum, cinfoDest);
-		}
-		// 更新会话列表
-	}
-
-	private void sendMessage() {
-		ChatMessage msg = null;
-		msg = new SingleChat();// 创建单聊消息
-		msg.setTargetId("15019288493");
-		msg.setSenderId("15019288493");
-		msg.setMsgType(MSGTYPE.MSG_DATA_TEXT);// 设置消息类型为文本
-		msg.setContent("石头你好"); // 设置消息内容
-		LogUtil.log("sendMessage");
-		if (mIMManager.sendmessage(msg)) { // 发送消息成功返回true
-			// 发送成功后把消息添加到消息列表中，收到消息发送回调后刷新界面
-			ToastUtil.show(this, "消息发送成功");
-			LogUtil.log("消息发送成功");
-			// currentMsgList.add(msg);
-		} else {
-			ToastUtil.show(this, "消息发送失败");
-			LogUtil.log("消息发送失败");
-		}
-	}
-
-	/**
-	 * 再按一次退出程序
-	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if ((System.currentTimeMillis() - mExitTime) > TIME_DIFF) {
-				ToastUtil.show(HomeActivity.this, "再按一次退出程序");
-				mExitTime = System.currentTimeMillis();
+
+			if ((System.currentTimeMillis() - exitTime) > TIME_DIFF) {
+				Toast.makeText(HomeActivity.this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+				exitTime = System.currentTimeMillis();
 			} else {
 				System.exit(0);
 			}
