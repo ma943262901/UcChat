@@ -2,7 +2,10 @@ package com.ucpaas.chat.activity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -18,12 +21,16 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,19 +40,20 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.adapter.ConversationReplyAdapter;
-import com.ucpaas.chat.config.AppConstants;
 import com.ucpaas.chat.support.SpOperation;
-import com.ucpaas.chat.support.UcUtils;
 import com.ucpaas.chat.util.AudioRecorder;
+import com.ucpaas.chat.util.ExpressionUtil;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.ToastUtil;
 import com.yzxIM.IMManager;
@@ -72,12 +80,14 @@ public class ConversationActivity extends Activity implements MessageListener,
 	private Context mContext;
 	private ConversationReplyAdapter mAdapter;
 
-	
+
 	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 
 	private String mUserId;
+	
 
+	
 	@SuppressLint("HandlerLeak")
 	private Handler mHandler = new Handler() {
 		@Override
@@ -124,37 +134,43 @@ public class ConversationActivity extends Activity implements MessageListener,
 
 		mListView = (ListView) findViewById(R.id.fb_reply_list);
 
-		// 下拉刷新组件
-		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.fb_reply_refresh);
-
-		// 下拉刷新
-		mSwipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
-			@Override
-			public void onRefresh() {
-
-				mHandler.postDelayed(new Runnable() {
-
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						mSwipeRefreshLayout.setRefreshing(false);
-					}
-				}, 2000);
-
-				// sync();
-			}
-		});
-
-		// 顶部刷新的样式
-		mSwipeRefreshLayout.setColorSchemeResources(
-				android.R.color.holo_red_light,
-				android.R.color.holo_green_light,
-				android.R.color.holo_blue_bright,
-				android.R.color.holo_orange_light);
+//		// 下拉刷新组件
+//		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.fb_reply_refresh);
+//
+//		// 下拉刷新
+//		mSwipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+//			@Override
+//			public void onRefresh() {
+//
+//				mHandler.postDelayed(new Runnable() {
+//
+//					@Override
+//					public void run() {
+//						// TODO Auto-generated method stub
+//						mSwipeRefreshLayout.setRefreshing(false);
+//					}
+//				}, 2000);
+//
+//				// sync();
+//			}
+//		});
+//
+//		// 顶部刷新的样式
+//		mSwipeRefreshLayout.setColorSchemeResources(
+//				android.R.color.holo_red_light,
+//				android.R.color.holo_green_light,
+//				android.R.color.holo_blue_bright,
+//				android.R.color.holo_orange_light);
 
 		initBottonMenu();
+		
+		initExpression();
+		showData();
 	}
 
+
+	
+	
 	/**
 	 * 发送消息
 	 * 
@@ -290,7 +306,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 
 	private LinearLayout mLayoutBottom;
 	private LinearLayout im_ll_file;
-	private LinearLayout im_ll_images;
+	private RelativeLayout im_ll_images;
 	private LinearLayout im_ll_more;
 	private LinearLayout im_ll_record;
 	private LinearLayout im_ll_shot;
@@ -309,7 +325,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 
 		im_ll_more = (LinearLayout) findViewById(R.id.im_ll_more);
 		im_ll_record = (LinearLayout) findViewById(R.id.im_ll_record);
-		im_ll_images = (LinearLayout) findViewById(R.id.im_ll_images);
+		im_ll_images = (RelativeLayout) findViewById(R.id.im_ll_images);
 		im_ll_shot = (LinearLayout) findViewById(R.id.im_ll_shot);
 		im_ll_shot.setOnClickListener(this);
 		im_ll_file = (LinearLayout) findViewById(R.id.im_ll_file);
@@ -380,7 +396,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 
     private static final int RECORD_OFF = 0; // 不在录音
     private static final int RECORD_ON = 1; // 正在录音
-    private static final String RECORD_FILENAME = "record0033"; // 录音文件名
+    private static final String RECORD_FILENAME = "record"; // 录音文件名
     private int recordState = 0; // 录音状态
     private float recodeTime = 0.0f; // 录音时长
     private double voiceValue = 0.0; // 录音的音量值
@@ -446,7 +462,7 @@ public class ConversationActivity extends Activity implements MessageListener,
                     } else {
                         textView_record_time.setText("录音时间："
                                 + ((int) recodeTime));
-                        String path = getAmrPath();
+                        String path = mAudioRecorder.getRecordPath();
                         sendVoiceMessage(path, (int)recodeTime + "");
 //                        mTvRecordPath.setText("文件路径：" + getAmrPath());
                     }
@@ -521,12 +537,12 @@ public class ConversationActivity extends Activity implements MessageListener,
         toast.show();
     }
 
- // 获取文件手机路径
-    private String getAmrPath() {
-        File file = new File(Environment.getExternalStorageDirectory(),
-                "WifiChat/voiceRecord/" + RECORD_FILENAME + ".amr");
-        return file.getAbsolutePath();
-    }
+// // 获取文件手机路径
+//    private String getAmrPath() {
+//        File file = new File(Environment.getExternalStorageDirectory(),
+//                "WifiChat/voiceRecord/" + RECORD_FILENAME + ".amr");
+//        return file.getAbsolutePath();
+//    }
 
     // 录音计时线程
     void recordTimethread() {
@@ -602,6 +618,188 @@ public class ConversationActivity extends Activity implements MessageListener,
         }
     };
     
+	
+	// 表情
+	private ImageView ivIcon = null;
+	private LinearLayout llBottonLin = null;
+
+	private int[] eImages;
+	private String[] eImageNames;
+	private int[] eImages1;
+	private String[] eImageNames1;
+	private int[] eImages2;
+	private String[] eImageNames2;
+	private ImageView emoji;
+	private SimpleAdapter simpleAdapter;
+	private List<Map<String, Object>> listItems;
+	private ViewPager viewPager;
+	private ArrayList<GridView> grids;
+	private GridView gView1;
+	private GridView gView2;
+	private GridView gView3;
+	private ImageView page0;
+	private ImageView page1;
+	private ImageView page2;
+	/**
+	 * 
+	 */
+	private void initExpression() {
+		llBottonLin = (LinearLayout) findViewById(R.id.ll_botton_lin);
+		viewPager = (ViewPager) findViewById(R.id.viewpager);
+		page0 = (ImageView) findViewById(R.id.page0_select);
+		page1 = (ImageView) findViewById(R.id.page1_select);
+		page2 = (ImageView) findViewById(R.id.page2_select);
+	}
+
+	
+
+	//展示表情
+	private void showData() {
+		eImages = ExpressionUtil.getIntense().expressionImgs;
+		eImageNames = ExpressionUtil.getIntense().expressionImgNames;
+		eImages1 = ExpressionUtil.getIntense().expressionImgs1;
+		eImageNames1 = ExpressionUtil.getIntense().expressionImgNames1;
+		eImages2 = ExpressionUtil.getIntense().expressionImgs2;
+		eImageNames2 = ExpressionUtil.getIntense().expressionImgNames2;
+		LayoutInflater inflater = LayoutInflater.from(this);
+		grids = new ArrayList<GridView>();
+		gView1 = (GridView) inflater.inflate(R.layout.grid1, null);
+		listItems = new ArrayList<Map<String, Object>>();
+		for (int i = 0; i < 24; i++) {
+			Map<String, Object> listItem = new HashMap<String, Object>();
+			listItem.put("image", eImages[i]);
+			listItems.add(listItem);
+		}
+		simpleAdapter = new SimpleAdapter(ConversationActivity.this, listItems,
+				R.layout.single_expression, new String[] { "image" },
+				new int[] { R.id.image });
+		gView1.setAdapter(simpleAdapter);
+		grids.add(gView1);
+
+		gView2 = (GridView) inflater.inflate(R.layout.grid2, null);
+		grids.add(gView2);
+
+		gView3 = (GridView) inflater.inflate(R.layout.grid3, null);
+		grids.add(gView3);
+		
+		// 填充ViewPager的数据适配器
+		PagerAdapter mPagerAdapter = new PagerAdapter() {
+			@Override
+			public boolean isViewFromObject(View arg0, Object arg1) {
+				return arg0 == arg1;
+			}
+
+			@Override
+			public int getCount() {
+				return grids.size();
+			}
+
+			@Override
+			public void destroyItem(View container, int position, Object object) {
+				((ViewPager) container).removeView(grids.get(position));
+			}
+
+			@Override
+			public Object instantiateItem(View container, int position) {
+				((ViewPager) container).addView(grids.get(position));
+				return grids.get(position);
+			}
+		};
+
+		viewPager.setAdapter(mPagerAdapter);
+		// viewPager.setAdapter();
+		viewPager.setOnPageChangeListener(new OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		viewPager.setOnPageChangeListener(new GuidePageChangeListener());
+	}
+    
+	class GuidePageChangeListener implements OnPageChangeListener {
+
+		@Override
+		public void onPageScrollStateChanged(int arg0) {
+			System.out.println("页面滚动" + arg0);
+
+		}
+
+		@Override
+		public void onPageScrolled(int arg0, float arg1, int arg2) {
+			System.out.println("换页了" + arg0);
+		}
+
+		@Override
+		public void onPageSelected(int arg0) {
+			switch (arg0) {
+			case 0:
+				page0.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_focused));
+				page1.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+
+				break;
+			case 1:
+				page1.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_focused));
+				page0.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+				page2.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+				List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
+				// 生成24个表情
+				for (int i = 0; i < 24; i++) {
+					Map<String, Object> listItem = new HashMap<String, Object>();
+					listItem.put("image", eImages1[i]);
+					listItems.add(listItem);
+				}
+
+				SimpleAdapter simpleAdapter = new SimpleAdapter(ConversationActivity.this,
+						listItems, R.layout.single_expression,
+						new String[] { "image" }, new int[] { R.id.image });
+				gView2.setAdapter(simpleAdapter);
+				break;
+			case 2:
+				page2.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_focused));
+				page1.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+				page0.setImageDrawable(getResources().getDrawable(
+						R.drawable.page_unfocused));
+				List<Map<String, Object>> listItems1 = new ArrayList<Map<String, Object>>();
+				// 生成24个表情
+				for (int i = 0; i < 24; i++) {
+					Map<String, Object> listItem = new HashMap<String, Object>();
+					listItem.put("image", eImages2[i]);
+					listItems1.add(listItem);
+				}
+
+				SimpleAdapter simpleAdapter1 = new SimpleAdapter(ConversationActivity.this,
+						listItems1, R.layout.single_expression,
+						new String[] { "image" }, new int[] { R.id.image });
+				gView3.setAdapter(simpleAdapter1);
+				break;
+
+			}
+		}
+	}
+	
+	
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {

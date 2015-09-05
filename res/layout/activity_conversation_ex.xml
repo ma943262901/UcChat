@@ -14,30 +14,33 @@
         android:layout_alignParentTop="true"
         layout="@layout/include_head_layout" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/fb_reply_refresh"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/ll_bottom"
-        android:layout_below="@+id/layout_feedback_head" >
+    <!-- <android.support.v4.widget.SwipeRefreshLayout -->
+    <!-- android:id="@+id/fb_reply_refresh" -->
+    <!-- android:layout_width="match_parent" -->
+    <!-- android:layout_height="wrap_content" -->
+    <!-- android:layout_above="@+id/ll_bottom" -->
+    <!-- android:layout_below="@+id/layout_feedback_head" > -->
 
-        <ListView
-            android:id="@+id/fb_reply_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@null"
-            android:listSelector="#00000000"
-            android:transcriptMode="normal" >
-        </ListView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <ListView
+    android:id="@+id/fb_reply_list"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_above="@+id/ll_bottom"
+    android:layout_below="@+id/layout_feedback_head"
+    android:divider="@null"
+    android:listSelector="#00000000"
+    android:transcriptMode="normal" >
+    </ListView>
+    <!-- </android.support.v4.widget.SwipeRefreshLayout> -->
 
     <LinearLayout
         android:id="@+id/im_network"
         android:layout_width="fill_parent"
         android:layout_height="50.0dip"
+        android:layout_below="@+id/fb_reply_refresh"
         android:background="#fffff0c5"
         android:orientation="horizontal"
-        android:layout_below="@+id/fb_reply_refresh"
         android:visibility="gone" >
 
         <ImageButton
@@ -291,7 +294,7 @@
             android:layout_height="fill_parent"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
-            android:visibility="visible" >
+            android:visibility="gone" >
 
             <TextView
                 android:id="@+id/im_tv_record"
@@ -335,34 +338,72 @@
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-        android:id="@+id/im_ll_images"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:visibility="gone" >
+        <RelativeLayout
+            android:id="@+id/im_ll_images"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone" >
 
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewpager"
+                android:layout_width="wrap_content"
+                android:layout_height="180dp"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:visibility="visible" >
+            </android.support.v4.view.ViewPager>
 
-<!--         <fragment -->
-<!--         android:id="@+id/emojicons" -->
-<!--         android:layout_width="fill_parent" -->
-<!--         android:layout_height="220.0dip" -->
-<!--         class="com.rockerhieu.emojicon.EmojiconsFragment" /> -->
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_botton_lin"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/viewpager"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:background="@color/white"
+                android:paddingBottom="5dp"
+                android:visibility="visible" >
+
+                <ImageView
+                    android:id="@+id/page0_select"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="matrix"
+                    android:src="@drawable/page_focused" />
+
+                <ImageView
+                    android:id="@+id/page1_select"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:scaleType="matrix"
+                    android:src="@drawable/page_unfocused" />
+
+                <ImageView
+                    android:id="@+id/page2_select"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:scaleType="matrix"
+                    android:src="@drawable/page_unfocused" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- <com.yzx.mydefineview.MyListView -->
+        <!-- android:id="@+id/messagelist" -->
+        <!-- android:layout_width="fill_parent" -->
+        <!-- android:layout_height="fill_parent" -->
+        <!-- android:layout_above="@id/ll_bottom" -->
+        <!-- android:layout_below="@id/im_network" -->
+        <!-- android:background="@drawable/message_bg1" -->
+        <!-- android:dividerHeight="0.0dip" -->
+        <!-- android:fadingEdge="none" -->
+        <!-- android:footerDividersEnabled="true" -->
+        <!-- android:listSelector="#00000000" -->
+        <!-- android:scrollbars="vertical" -->
+        <!-- android:transcriptMode="normal" /> -->
+
     </LinearLayout>
-
-    <!-- <com.yzx.mydefineview.MyListView -->
-    <!-- android:id="@+id/messagelist" -->
-    <!-- android:layout_width="fill_parent" -->
-    <!-- android:layout_height="fill_parent" -->
-    <!-- android:layout_above="@id/ll_bottom" -->
-    <!-- android:layout_below="@id/im_network" -->
-    <!-- android:background="@drawable/message_bg1" -->
-    <!-- android:dividerHeight="0.0dip" -->
-    <!-- android:fadingEdge="none" -->
-    <!-- android:footerDividersEnabled="true" -->
-    <!-- android:listSelector="#00000000" -->
-    <!-- android:scrollbars="vertical" -->
-    <!-- android:transcriptMode="normal" /> -->
 
 </RelativeLayout>
