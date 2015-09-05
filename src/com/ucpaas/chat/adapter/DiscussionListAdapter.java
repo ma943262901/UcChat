@@ -12,29 +12,28 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ucpaas.chat.R;
-import com.ucpaas.chat.bean.GroupInfo;
 import com.yzxIM.data.CategoryId;
 import com.yzxIM.data.db.ConversationInfo;
 
 /**
- * 群组列表
+ * 讨论组列表
  * 
  * @author tangqi
  * @data 2015年8月9日下午2:01:25
  */
 
-public class GroupListAdapter extends BaseAdapter {
+public class DiscussionListAdapter extends BaseAdapter {
 
 	private Context context;
-	private List<GroupInfo> list;
+	private List<ConversationInfo> list;
 
-	public GroupListAdapter(Context context, List<GroupInfo> list) {
+	public DiscussionListAdapter(Context context, List<ConversationInfo> list) {
 		super();
 		this.context = context;
 		this.list = list;
 	}
 
-	public void setList(List<GroupInfo> list) {
+	public void setList(List<ConversationInfo> list) {
 		this.list = list;
 	}
 
@@ -43,7 +42,7 @@ public class GroupListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public GroupInfo getItem(int position) {
+	public ConversationInfo getItem(int position) {
 		return list.get(position);
 	}
 
@@ -53,7 +52,7 @@ public class GroupListAdapter extends BaseAdapter {
 
 	@SuppressLint("InflateParams")
 	public View getView(int position, View convertView, ViewGroup parent) {
-		GroupInfo groupInfo = getItem(position);
+		ConversationInfo conversationInfo = getItem(position);
 		ViewHolder holder = null;
 		if (convertView == null) {
 			convertView = LayoutInflater.from(context).inflate(R.layout.listitem_group, null);
@@ -66,9 +65,18 @@ public class GroupListAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		holder.ivGroup.setImageResource(R.drawable.person_group);
-		holder.tvGroupName.setText(groupInfo.getGroupName());
-
+		if (CategoryId.DISCUSSION == conversationInfo.getCategoryId()) {
+			holder.ivGroup.setImageResource(R.drawable.person_discussion);
+		} else if (CategoryId.GROUP == conversationInfo.getCategoryId()) {
+			holder.ivGroup.setImageResource(R.drawable.person_group);
+		} else if (CategoryId.PERSONAL == conversationInfo.getCategoryId()) {
+			holder.ivGroup.setImageResource(R.drawable.person);
+		} else {
+			holder.ivGroup.setImageResource(R.drawable.person);
+		}
+		
+		holder.tvGroupName.setText(conversationInfo.getConversationTitle());
+		
 		return convertView;
 	}
 

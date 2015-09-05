@@ -76,6 +76,21 @@ public class RequestFactory {
 
 		String url = getRequestUrl(action, params);
 		return url;
+	}
 
+	/**
+	 * 查询群组
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public String getQueryGroup(String userName) {
+		String action = AppConstants.ACTION_QUERY_GROUP;
+
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("userid", userName);
+
+		String url = getRequestUrl(action, params);
+		return url;
 	}
 }

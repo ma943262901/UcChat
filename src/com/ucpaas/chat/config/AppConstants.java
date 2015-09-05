@@ -23,6 +23,25 @@ public class AppConstants {
 	 * 用户登录
 	 */
 	public static final String ACTION_USER_LOGIN = "/user/login.do";
-	
+
+	/**
+	 * 创建群组
+	 */
+	public static final String ACTION_create_GROUP = "/user/createGroup.do";
+
+	/**
+	 * 加入群组
+	 */
+	public static final String ACTION_JOIN_GROUP = "/user/joinGroup.do";
+
+	/**
+	 * 退出群组
+	 */
+	public static final String ACTION_QUIT_GROUP = "/user/quitGroup.do";
+
+	/**
+	 * 查询群组
+	 */
+	public static final String ACTION_QUERY_GROUP = "/user/queryGroup.do";
 
 }

@@ -5,6 +5,9 @@ import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.activity.ConversationActivity;
 import com.ucpaas.chat.activity.DiscussionListActivity;
+import com.ucpaas.chat.activity.GroupListActivity;
 import com.ucpaas.chat.adapter.ContactListAdapter;
 import com.ucpaas.chat.base.BaseFragment;
 import com.ucpaas.chat.bean.UserInfo;
@@ -37,6 +41,7 @@ import com.yzxIM.data.db.ConversationInfo;
 
 public class ContactFragment extends BaseFragment implements OnClickListener, OnItemClickListener {
 
+	protected static final int MSG_INSERT_CONTACT = 1;
 	private View rootView;
 	private ContactDb mDb;
 
@@ -73,7 +78,7 @@ public class ContactFragment extends BaseFragment implements OnClickListener, On
 		view.findViewById(R.id.ll_group).setOnClickListener(this);
 		view.findViewById(R.id.ll_discussion).setOnClickListener(this);
 		mListView = (ListView) view.findViewById(R.id.lv_contact);
-//		mScrollView = (ScrollView) view.findViewById(R.id.sv_contact);
+		// mScrollView = (ScrollView) view.findViewById(R.id.sv_contact);
 
 		initContact();
 	}
@@ -83,14 +88,26 @@ public class ContactFragment extends BaseFragment implements OnClickListener, On
 		mDb = new ContactDbImpl(getActivity());
 
 		boolean isFirstLogin = SpOperation.getIsFirstLogin(getActivity());
+
 		if (isFirstLogin) {
-			List<UserInfo> userInfoList = getContactList();
-			mDb.insert(userInfoList);
-			SpOperation.setIsFirstLogin(getActivity(), false);
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					List<UserInfo> userInfoList = getContactList();
+					mDb.insert(userInfoList);
+					SpOperation.setIsFirstLogin(getActivity(), false);
+					mHandler.sendEmptyMessage(MSG_INSERT_CONTACT);
+				}
+			}).start();
+			;
+		} else {
+			mHandler.sendEmptyMessage(MSG_INSERT_CONTACT);
 		}
 
 		mConversationInfoList = IMManager.getInstance(getActivity()).getConversationList();
-		mUserInfoList = mDb.queryAll();
+		mUserInfoList = new ArrayList<UserInfo>();
 		mAdapter = new ContactListAdapter(getActivity(), mUserInfoList);
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(this);
@@ -98,36 +115,6 @@ public class ContactFragment extends BaseFragment implements OnClickListener, On
 
 	private List<UserInfo> getContactList() {
 		List<UserInfo> userInfoList = new ArrayList<UserInfo>();
-
-		UserInfo userInfo12 = new UserInfo();
-		userInfo12.setPhone("13632809278");
-		userInfo12.setNickname("小唐");
-		userInfoList.add(userInfo12);
-
-		UserInfo userInfo11 = new UserInfo();
-		userInfo11.setPhone("15019288493");
-		userInfo11.setNickname("石头");
-		userInfoList.add(userInfo11);
-
-		UserInfo userInfo7 = new UserInfo();
-		userInfo7.setPhone("13632809277");
-		userInfo7.setNickname("test7");
-		userInfoList.add(userInfo7);
-
-		UserInfo userInfo6 = new UserInfo();
-		userInfo6.setPhone("13632809276");
-		userInfo6.setNickname("test6");
-		userInfoList.add(userInfo6);
-
-		UserInfo userInfo5 = new UserInfo();
-		userInfo5.setPhone("13632809275");
-		userInfo5.setNickname("test5");
-		userInfoList.add(userInfo5);
-
-		UserInfo userInfo4 = new UserInfo();
-		userInfo4.setPhone("13632809274");
-		userInfo4.setNickname("test4");
-		userInfoList.add(userInfo4);
 
 		UserInfo userInfo3 = new UserInfo();
 		userInfo3.setPhone("13632809273");
@@ -144,6 +131,16 @@ public class ContactFragment extends BaseFragment implements OnClickListener, On
 		userInfo1.setNickname("test1");
 		userInfoList.add(userInfo1);
 
+		UserInfo userInfo11 = new UserInfo();
+		userInfo11.setPhone("15019288493");
+		userInfo11.setNickname("石头");
+		userInfoList.add(userInfo11);
+
+		UserInfo userInfo12 = new UserInfo();
+		userInfo12.setPhone("13632809278");
+		userInfo12.setNickname("小唐");
+		userInfoList.add(userInfo12);
+
 		return userInfoList;
 	}
 
@@ -151,19 +148,19 @@ public class ContactFragment extends BaseFragment implements OnClickListener, On
 	public void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-//		mScrollX = mScrollView.getScrollX();
-//		mScrollY = mScrollView.getScrollY();
+		// mScrollX = mScrollView.getScrollX();
+		// mScrollY = mScrollView.getScrollY();
 	}
 
 	@Override
 	public void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-//		mScrollView.post(new Runnable() {   
-//		    public void run() {  
-//		    	mScrollView.smoothScrollTo(mScrollX, mScrollY);
-//		    }   
-//		}); 
+		// mScrollView.post(new Runnable() {
+		// public void run() {
+		// mScrollView.smoothScrollTo(mScrollX, mScrollY);
+		// }
+		// });
 	}
 
 	@Override
@@ -175,6 +172,8 @@ public class ContactFragment extends BaseFragment implements OnClickListener, On
 			break;
 
 		case R.id.ll_group:
+			intent = new Intent(getActivity(), GroupListActivity.class);
+			intent.putExtra("categoryId", CategoryId.GROUP);
 			break;
 
 		case R.id.ll_discussion:
@@ -196,10 +195,12 @@ public class ContactFragment extends BaseFragment implements OnClickListener, On
 		// TODO Auto-generated method stub
 		UserInfo userInfo = (UserInfo) parent.getAdapter().getItem(position);
 
+		// 判断会话是否已存在
 		boolean isExist = false;
 		if (mConversationInfoList != null) {
 			for (ConversationInfo conversationInfo : mConversationInfoList) {
 				if (conversationInfo.getTargetId().equals(userInfo.getPhone())) {
+					// 会话已创建
 					doContact(conversationInfo);
 					isExist = true;
 					break;
@@ -207,20 +208,53 @@ public class ContactFragment extends BaseFragment implements OnClickListener, On
 			}
 		}
 
+		// 会话不存在，新建
 		if (!isExist) {
 			ConversationInfo conversationInfo = new ConversationInfo();
 			conversationInfo.setTargetId(userInfo.getPhone());
 			conversationInfo.setCategoryId(CategoryId.PERSONAL);
-			conversationInfo.setConversationTitle(conversationInfo.getTargetId());
+			if (!TextUtils.isEmpty(userInfo.getNickname())) {
+				conversationInfo.setConversationTitle(userInfo.getNickname());
+			} else {
+				conversationInfo.setConversationTitle(userInfo.getPhone());
+			}
+
 			doContact(conversationInfo);
 		}
 	}
 
+	/**
+	 * 跳转聊天界面
+	 * 
+	 * @param conversationInfo
+	 */
 	public void doContact(ConversationInfo conversationInfo) {
 		// TODO Auto-generated method stub
 		Intent intent = new Intent(getActivity(), ConversationActivity.class);
 		intent.putExtra("conversation", conversationInfo);
 		startActivity(intent);
 	}
+
+	private void updateListView() {
+		// TODO Auto-generated method stub
+		mUserInfoList = mDb.queryAll();
+		mAdapter.setList(mUserInfoList);
+	}
+
+	private Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			switch (msg.what) {
+			case MSG_INSERT_CONTACT:
+				updateListView();
+				break;
+
+			default:
+				break;
+			}
+			super.handleMessage(msg);
+		}
+	};
 
 }

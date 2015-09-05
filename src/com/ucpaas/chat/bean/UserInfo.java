@@ -27,6 +27,9 @@ public class UserInfo extends BaseEntity{
 	
 	@Column(column = "portraituri")
 	private String portraituri;
+	
+	@Column(column = "userid")
+	private String userid;
 
 	public String getResult() {
 		return result;
@@ -72,6 +75,14 @@ public class UserInfo extends BaseEntity{
 	public String toString() {
 		return "UserInfo [result=" + result + ", phone=" + phone + ", imtoken=" + imtoken + ", nickname=" + nickname + ", portraituri=" + portraituri
 				+ "]";
+	}
+
+	public String getUserid() {
+		return userid;
+	}
+
+	public void setUserid(String userid) {
+		this.userid = userid;
 	}
 
 }

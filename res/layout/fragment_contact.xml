@@ -104,10 +104,6 @@
                     android:textSize="@dimen/content_size" />
             </LinearLayout>
 
-            <include
-                layout="@layout/include_line_layout"
-                android:padding="8dip" />
-
             <ListView
                 android:id="@+id/lv_contact"
                 android:layout_width="match_parent"

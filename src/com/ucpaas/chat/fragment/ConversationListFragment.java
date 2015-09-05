@@ -1,6 +1,8 @@
 package com.ucpaas.chat.fragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.content.Intent;
@@ -32,13 +34,14 @@ import com.yzxtcp.data.UcsReason;
 import com.yzxtcp.listener.ILoginListener;
 
 /**
- * 聊天列表
+ * 会话列表
  * 
  * @author tangqi
  * @date 2015年9月5日下午2:18:35
  */
 
-public class ConversationListFragment extends BaseFragment implements OnItemClickListener, IConversationListener {
+public class ConversationListFragment extends BaseFragment implements OnItemClickListener, IConversationListener,
+		Comparator<ConversationInfo> {
 
 	private View rootView;
 	private ListView mListView;
@@ -168,6 +171,7 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
+				Collections.sort(mConversationLists, ConversationListFragment.this);
 				mAdapter.notifyDataSetChanged();
 			}
 		});
@@ -227,5 +231,14 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 			ToastUtil.show(getActivity(), "消息发送失败");
 			LogUtil.log("消息发送失败");
 		}
+	}
+
+	/**
+	 * 会话排序（按照更新时间倒序）
+	 */
+	@Override
+	public int compare(ConversationInfo lhs, ConversationInfo rhs) {
+		// TODO Auto-generated method stub
+		return lhs.getLastTime() >= rhs.getLastTime() ? -1 : 1;
 	}
 }

@@ -34,6 +34,7 @@ public class ContactListAdapter extends BaseAdapter {
 
 	public void setList(List<UserInfo> list) {
 		this.list = list;
+		notifyDataSetChanged();
 	}
 
 	public int getCount() {

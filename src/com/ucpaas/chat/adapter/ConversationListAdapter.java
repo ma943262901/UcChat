@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.util.DateUtil;
 import com.yzxIM.data.CategoryId;
+import com.yzxIM.data.MSGTYPE;
 import com.yzxIM.data.db.ChatMessage;
 import com.yzxIM.data.db.ConversationInfo;
 
@@ -80,16 +81,27 @@ public class ConversationListAdapter extends BaseAdapter {
 		} else {
 			holder.image.setImageResource(R.drawable.person);
 		}
-		
+
 		holder.tvTitle.setText(conversationInfo.getConversationTitle());
 		holder.tvLastTime.setText(DateUtil.format(DateUtil.MMDD_HHMM, conversationInfo.getLastTime()));
 
 		List<ChatMessage> currentMsgList = new ArrayList<ChatMessage>();
 		try {
 			currentMsgList = conversationInfo.getLastestMessages(0, 1);
-			String lastMessage = currentMsgList.get(0).getContent();
-			if (!TextUtils.isEmpty(lastMessage)) {
-				holder.tvDesc.setText(lastMessage);
+			ChatMessage lastMessage = currentMsgList.get(0);
+			String lastContent = lastMessage.getContent();
+			if (MSGTYPE.MSG_DATA_TEXT == lastMessage.getMsgType()) {
+				if (!TextUtils.isEmpty(lastContent)) {
+					holder.tvDesc.setText(lastContent);
+				}
+			} else if (MSGTYPE.MSG_DATA_IMAGE == lastMessage.getMsgType()) {
+				holder.tvDesc.setText("[图片]");
+			} else if (MSGTYPE.MSG_DATA_VOICE == lastMessage.getMsgType()) {
+				holder.tvDesc.setText("[语音]");
+			} else {
+				if (!TextUtils.isEmpty(lastContent)) {
+					holder.tvDesc.setText(lastContent);
+				}
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

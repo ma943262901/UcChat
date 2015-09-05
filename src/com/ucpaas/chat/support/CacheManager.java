@@ -1,7 +1,5 @@
 package com.ucpaas.chat.support;
 
-import java.io.File;
-
 import android.content.Context;
 
 import com.ucpaas.chat.util.FileUtils;
@@ -26,12 +24,12 @@ public class CacheManager {
 	}
 
 	/**
-	 * 获取博客收藏数据库目录
+	 * 获取联系人列表
 	 * 
 	 * @param context
 	 * @return
 	 */
 	public static String getFriendDbPath(Context context) {
-		return FileUtils.getExternalCacheDir(context) + File.separator + "friend";
+		return context.getCacheDir().getAbsolutePath();
 	}
 }
