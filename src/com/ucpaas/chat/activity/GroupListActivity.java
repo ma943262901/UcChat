@@ -25,7 +25,6 @@ import com.ucpaas.chat.util.ToastUtil;
 import com.yzxIM.IMManager;
 import com.yzxIM.data.CategoryId;
 import com.yzxIM.data.db.ConversationInfo;
-import com.yzxIM.data.db.DiscussionInfo;
 
 /**
  * 群组列表
@@ -143,7 +142,7 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 			@Override
 			public void onResponse(String response) {
 				// TODO Auto-generated method stub
-				ToastUtil.show(GroupListActivity.this, "查询成功");
+				// ToastUtil.show(GroupListActivity.this, "查询成功");
 				mGroupInfoList = JSONUtils.parseGroupInfo(response);
 				sync(null);
 			}
