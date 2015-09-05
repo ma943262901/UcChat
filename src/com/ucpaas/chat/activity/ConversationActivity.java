@@ -59,6 +59,8 @@ public class ConversationActivity extends Activity implements MessageListener,
 	private Context mContext;
 	private ConversationReplyAdapter mAdapter;
 
+	
+	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 
 	private String mUserId;
