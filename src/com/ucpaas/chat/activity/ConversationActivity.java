@@ -380,7 +380,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 
     private static final int RECORD_OFF = 0; // 不在录音
     private static final int RECORD_ON = 1; // 正在录音
-    private static final String RECORD_FILENAME = "record0033"; // 录音文件名
+    private static final String RECORD_FILENAME = "record"; // 录音文件名
     private int recordState = 0; // 录音状态
     private float recodeTime = 0.0f; // 录音时长
     private double voiceValue = 0.0; // 录音的音量值
@@ -446,7 +446,7 @@ public class ConversationActivity extends Activity implements MessageListener,
                     } else {
                         textView_record_time.setText("录音时间："
                                 + ((int) recodeTime));
-                        String path = getAmrPath();
+                        String path = mAudioRecorder.getRecordPath();
                         sendVoiceMessage(path, (int)recodeTime + "");
 //                        mTvRecordPath.setText("文件路径：" + getAmrPath());
                     }
@@ -521,12 +521,12 @@ public class ConversationActivity extends Activity implements MessageListener,
         toast.show();
     }
 
- // 获取文件手机路径
-    private String getAmrPath() {
-        File file = new File(Environment.getExternalStorageDirectory(),
-                "WifiChat/voiceRecord/" + RECORD_FILENAME + ".amr");
-        return file.getAbsolutePath();
-    }
+// // 获取文件手机路径
+//    private String getAmrPath() {
+//        File file = new File(Environment.getExternalStorageDirectory(),
+//                "WifiChat/voiceRecord/" + RECORD_FILENAME + ".amr");
+//        return file.getAbsolutePath();
+//    }
 
     // 录音计时线程
     void recordTimethread() {

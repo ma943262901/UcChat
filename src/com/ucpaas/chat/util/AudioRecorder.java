@@ -20,8 +20,11 @@ public class AudioRecorder {
     }
 
     private String sanitizePath(String path) {
-        return Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/WifiChat/voiceRecord/" + path + ".amr";
+//        return Environment.getExternalStorageDirectory().getAbsolutePath()
+//                + "/WifiChat/voiceRecord/" + path + System.currentTimeMillis()+".amr";
+        File file = new File(Environment.getExternalStorageDirectory(),
+                "WifiChat/voiceRecord/" + System.currentTimeMillis() + ".amr");
+        return file.getAbsolutePath();
     }
 
     public void start() throws IOException {
@@ -54,5 +57,8 @@ public class AudioRecorder {
             return (mMediaRecorder.getMaxAmplitude());
         } else
             return 0;
+    }
+    public String getRecordPath(){
+    	return mPath;
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.view.LayoutInflater;
@@ -277,6 +278,7 @@ public class ConversationReplyAdapter extends BaseAdapter {
 	/**
 	 * 
 	 */
+	private AnimationDrawable mAnitmation;
 	private void playRecord(ChatMessage chatMessage){
 		//播放语音
 		final ChatMessage data = chatMessage;
@@ -290,7 +292,7 @@ public class ConversationReplyAdapter extends BaseAdapter {
 						mMediaPlayer.setDataSource(data.getPath());
 						mMediaPlayer.prepare();
 						playStatus = true;
-						mMediaPlayer.start();
+						mMediaPlayer.start();			
 						mMediaPlayer.setOnCompletionListener(new OnCompletionListener() {
 							
 							@Override
@@ -298,8 +300,27 @@ public class ConversationReplyAdapter extends BaseAdapter {
 								if (playStatus) {
 									playStatus = false;
 								}
+								if (mAnitmation != null && mAnitmation.isRunning()) {
+									mAnitmation.stop();
+								}
 							}
 						});
+						//设置动画
+						if (holder.imgVoiceSrc != null) {
+							if(data.getIsFromMyself()){
+								holder.imgVoiceSrc.setBackgroundResource(R.anim.im_right_voice);
+//								holder.imgVoiceSrc.setImageResource(R.anim.im_right_voice);
+							}else {
+								holder.imgVoiceSrc.setBackgroundResource(R.anim.im_left_voice);
+//								holder.imgVoiceSrc.setImageResource(R.anim.im_left_voice);
+							}
+							mAnitmation = (AnimationDrawable) holder.imgVoiceSrc.getBackground();
+							mAnitmation.setOneShot(false);
+							if (!mAnitmation.isRunning()) {
+								mAnitmation.start();
+							}
+						}
+
 						
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
@@ -316,6 +337,9 @@ public class ConversationReplyAdapter extends BaseAdapter {
 						playStatus = false;
 					}else {
 						playStatus = false;
+					}
+					if (mAnitmation != null && mAnitmation.isRunning()) {
+						mAnitmation.stop();
 					}
 				}
 			}
