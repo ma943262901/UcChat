@@ -223,7 +223,6 @@ public class ContactFragment extends BaseFragment implements OnClickListener, On
 	 * @param conversationInfo
 	 */
 	public void doContact(ConversationInfo conversationInfo) {
-		// TODO Auto-generated method stub
 		Intent intent = new Intent(getActivity(), ConversationActivity.class);
 		intent.putExtra("conversation", conversationInfo);
 		startActivity(intent);

@@ -56,6 +56,7 @@ import com.ucpaas.chat.adapter.ConversationReplyAdapter;
 import com.ucpaas.chat.support.SpOperation;
 import com.ucpaas.chat.util.AudioRecorder;
 import com.ucpaas.chat.util.ExpressionUtil;
+import com.ucpaas.chat.util.KeyBoardUtils;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.ToastUtil;
 import com.yzxIM.IMManager;
@@ -106,6 +107,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 		mConversationInfo = (ConversationInfo) getIntent()
 				.getSerializableExtra("conversation");
 		mChatMessages = mConversationInfo.getAllMessage();
+
 		mUserId = SpOperation.getUserId(this);
 
 		initView();
@@ -113,6 +115,11 @@ public class ConversationActivity extends Activity implements MessageListener,
 				mChatMessages);
 		mListView.setAdapter(mAdapter);
 		sync();
+
+		Intent intent = new Intent();
+		intent.putExtra("ConversationTitle",
+				mConversationInfo.getConversationTitle());
+		setResult(Activity.RESULT_OK, intent);
 	}
 
 	private void initView() {
@@ -334,14 +341,29 @@ public class ConversationActivity extends Activity implements MessageListener,
 		mSendBtn.setOnClickListener(this);
 		mInputEdit = (EditText) findViewById(R.id.fb_send_content);
 
+		mInputEdit.setOnTouchListener(new OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				im_ll_more.setVisibility(View.GONE);
+				im_ll_images.setVisibility(View.GONE);
+				im_ll_record.setVisibility(View.GONE);
+				return false;
+			}
+		});
+
 		mInputEdit.setOnFocusChangeListener(new OnFocusChangeListener() {
 
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				// 隐藏其他布局
-				im_ll_more.setVisibility(View.GONE);
-				im_ll_images.setVisibility(View.GONE);
-				im_ll_record.setVisibility(View.GONE);
+				if (hasFocus) {
+					im_ll_more.setVisibility(View.GONE);
+					im_ll_images.setVisibility(View.GONE);
+					im_ll_record.setVisibility(View.GONE);
+					KeyBoardUtils.openKeybord(mInputEdit, mContext);
+				}
+
 			}
 		});
 
@@ -350,8 +372,10 @@ public class ConversationActivity extends Activity implements MessageListener,
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
-				// TODO Auto-generated method stub
-
+				if (mInputEdit.getText().toString().equals("")) {
+					mSendBtn.setVisibility(View.GONE);
+					mBtnMore.setVisibility(View.VISIBLE);
+				}
 			}
 
 			@Override
@@ -363,10 +387,13 @@ public class ConversationActivity extends Activity implements MessageListener,
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if (mSendBtn.getVisibility() != View.VISIBLE) {
-					mSendBtn.setVisibility(View.VISIBLE);
-					mBtnMore.setVisibility(View.GONE);
+				if (!mInputEdit.getText().toString().equals("")) {
+					if (mSendBtn.getVisibility() != View.VISIBLE) {
+						mSendBtn.setVisibility(View.VISIBLE);
+						mBtnMore.setVisibility(View.GONE);
+					}
 				}
+
 			}
 		});
 
@@ -693,8 +720,8 @@ public class ConversationActivity extends Activity implements MessageListener,
 					int position, long id) {
 				doClickExpression(parent, view, position, id, gView2);
 			}
-		});	
-		
+		});
+
 		gView3 = (GridView) inflater.inflate(R.layout.grid3, null);
 		grids.add(gView3);
 		gView3.setOnItemClickListener(new OnItemClickListener() {
@@ -704,7 +731,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 					int position, long id) {
 				doClickExpression(parent, view, position, id, gView3);
 			}
-		});	
+		});
 
 		// 填充ViewPager的数据适配器
 		PagerAdapter mPagerAdapter = new PagerAdapter() {
@@ -875,17 +902,22 @@ public class ConversationActivity extends Activity implements MessageListener,
 				im_ll_images.setVisibility(View.GONE);
 				im_ll_record.setVisibility(View.VISIBLE);
 			}
+			KeyBoardUtils.closeKeybord(mInputEdit, mContext);
 		}
 			break;
 		// 表情按钮
 		case R.id.im_expression_image: {
 			if (im_ll_images.getVisibility() == View.VISIBLE) {
 				im_ll_images.setVisibility(View.GONE);
+				KeyBoardUtils.openKeybord(mInputEdit, mContext);
 			} else {
+				KeyBoardUtils.closeKeybord(mInputEdit, mContext);
 				im_ll_more.setVisibility(View.GONE);
 				im_ll_record.setVisibility(View.GONE);
 				im_ll_images.setVisibility(View.VISIBLE);
+
 			}
+
 		}
 			break;
 		// 更多按钮
@@ -897,6 +929,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 				im_ll_images.setVisibility(View.GONE);
 				im_ll_more.setVisibility(View.VISIBLE);
 			}
+			KeyBoardUtils.closeKeybord(mInputEdit, mContext);
 
 		}
 			break;
@@ -963,6 +996,13 @@ public class ConversationActivity extends Activity implements MessageListener,
 				sendImageMessage(path, path);
 			}
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+
+		finish();
 	}
 
 }

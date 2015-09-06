@@ -49,7 +49,8 @@ public class ConversationReplyAdapter extends BaseAdapter {
 	private List<ChatMessage> mList;
 	private Context mContext;
 
-	public ConversationReplyAdapter(Context context, List<ChatMessage> mChatMessages) {
+	public ConversationReplyAdapter(Context context,
+			List<ChatMessage> mChatMessages) {
 		this.mList = mChatMessages;
 		this.mContext = context;
 	}
@@ -80,7 +81,8 @@ public class ConversationReplyAdapter extends BaseAdapter {
 		// 获取单条回复
 		int type = 0;
 		ChatMessage chatMessage = getItem(position);
-		if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_TEXT || chatMessage.getMsgType() == MSGTYPE.MSG_DATA_SYSTEM) {
+		if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_TEXT
+				|| chatMessage.getMsgType() == MSGTYPE.MSG_DATA_SYSTEM) {
 			if (chatMessage.getIsFromMyself()) {
 				// 开发者回复Item布局
 				type = VIEW_TEXT_R;
@@ -124,55 +126,72 @@ public class ConversationReplyAdapter extends BaseAdapter {
 	/**
 	 * 
 	 */
-	private View initConvertView(int position, View convertView, ChatMessage chatMessage) {
+	private View initConvertView(int position, View convertView,
+			ChatMessage chatMessage) {
 
 		// 根据Type的类型来加载不同的Item布局
 		if (convertView == null) {
 			// 文本消息
-			if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_TEXT || chatMessage.getMsgType() == MSGTYPE.MSG_DATA_SYSTEM) {
+			if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_TEXT
+					|| chatMessage.getMsgType() == MSGTYPE.MSG_DATA_SYSTEM) {
 				if (chatMessage.getIsFromMyself()) {
 					// 本人发送
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.conversation_text_right, null);
+					convertView = LayoutInflater.from(mContext).inflate(
+							R.layout.conversation_text_right, null);
 				} else {
 					// 他人回复
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.conversation_text_left, null);
+					convertView = LayoutInflater.from(mContext).inflate(
+							R.layout.conversation_text_left, null);
 				}
 				// 图片消息
 			} else if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_IMAGE) {
 				if (chatMessage.getIsFromMyself()) {
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.conversation_image_right, null);
+					convertView = LayoutInflater.from(mContext).inflate(
+							R.layout.conversation_image_right, null);
 				} else {
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.conversation_image_left, null);
+					convertView = LayoutInflater.from(mContext).inflate(
+							R.layout.conversation_image_left, null);
 				}
 				// 语音消息
 			} else if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_VOICE) {
 				if (chatMessage.getIsFromMyself()) {
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.conversation_voice_right, null);
+					convertView = LayoutInflater.from(mContext).inflate(
+							R.layout.conversation_voice_right, null);
 				} else {
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.conversation_voice_left, null);
+					convertView = LayoutInflater.from(mContext).inflate(
+							R.layout.conversation_voice_left, null);
 				}
 			} else {
 				if (chatMessage.getIsFromMyself()) {
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.conversation_text_right, null);
+					convertView = LayoutInflater.from(mContext).inflate(
+							R.layout.conversation_text_right, null);
 				} else {
-					convertView = LayoutInflater.from(mContext).inflate(R.layout.conversation_text_left, null);
+					convertView = LayoutInflater.from(mContext).inflate(
+							R.layout.conversation_text_left, null);
 				}
 			}
 
 			// 创建ViewHolder并获取各种View
 			holder = new ViewHolder();
 
-			holder.replyContent = (TextView) convertView.findViewById(R.id.fb_reply_content);
-			holder.replyProgressBar = (ProgressBar) convertView.findViewById(R.id.fb_reply_progressBar);
-			holder.replyStateFailed = (ImageView) convertView.findViewById(R.id.fb_reply_state_failed);
-			holder.replyData = (TextView) convertView.findViewById(R.id.fb_reply_date);
+			holder.replyContent = (TextView) convertView
+					.findViewById(R.id.fb_reply_content);
+			holder.replyProgressBar = (ProgressBar) convertView
+					.findViewById(R.id.fb_reply_progressBar);
+			holder.replyStateFailed = (ImageView) convertView
+					.findViewById(R.id.fb_reply_state_failed);
+			holder.replyData = (TextView) convertView
+					.findViewById(R.id.fb_reply_date);
 
 			// 图片
-			holder.replyImgSmall = (ImageView) convertView.findViewById(R.id.img_small_pic);
+			holder.replyImgSmall = (ImageView) convertView
+					.findViewById(R.id.img_small_pic);
 
 			// 语音
-			holder.imgVoiceSrc = (ImageView) convertView.findViewById(R.id.img_voice);
-			holder.txvVoiceTime = (TextView) convertView.findViewById(R.id.tv_voice_time);
+			holder.imgVoiceSrc = (ImageView) convertView
+					.findViewById(R.id.img_voice);
+			holder.txvVoiceTime = (TextView) convertView
+					.findViewById(R.id.tv_voice_time);
 
 			convertView.setTag(holder);
 
@@ -192,15 +211,18 @@ public class ConversationReplyAdapter extends BaseAdapter {
 	private void setData(int position, ChatMessage chatMessage) {
 
 		// 文本消息
-		if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_TEXT || chatMessage.getMsgType() == MSGTYPE.MSG_DATA_SYSTEM) {
+		if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_TEXT
+				|| chatMessage.getMsgType() == MSGTYPE.MSG_DATA_SYSTEM) {
 
 			// 填充表情
-			SpannableString span = ExpressionUtil.getInstace().getExpressionString(mContext, chatMessage.getContent());
+			SpannableString span = ExpressionUtil.getInstace()
+					.getExpressionString(mContext, chatMessage.getContent());
 			holder.replyContent.setText(span);
 
 			// 图片消息
 		} else if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_IMAGE) {
-			ImageLoaderUtils.displaySdcardImg(chatMessage.getContent(), holder.replyImgSmall);
+			ImageLoaderUtils.displaySdcardImg(chatMessage.getContent(),
+					holder.replyImgSmall);
 
 			final ChatMessage data = chatMessage;
 			holder.replyImgSmall.setOnClickListener(new OnClickListener() {
@@ -255,7 +277,7 @@ public class ConversationReplyAdapter extends BaseAdapter {
 	 */
 	private AnimationDrawable mAnitmation;
 
-	private void playRecord(ChatMessage chatMessage) {
+	private void playRecord(final ChatMessage chatMessage) {
 		// 播放语音
 		final ChatMessage data = chatMessage;
 		holder.imgVoiceSrc.setOnClickListener(new OnClickListener() {
@@ -269,32 +291,37 @@ public class ConversationReplyAdapter extends BaseAdapter {
 						mMediaPlayer.prepare();
 						playStatus = true;
 						mMediaPlayer.start();
-						mMediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+						final View tmpView = v;
+						mMediaPlayer
+								.setOnCompletionListener(new OnCompletionListener() {
 
-							@Override
-							public void onCompletion(MediaPlayer mp) {
-								if (playStatus) {
-									playStatus = false;
-								}
-								if (mAnitmation != null && mAnitmation.isRunning()) {
-									mAnitmation.stop();
-								}
-							}
-						});
+									@Override
+									public void onCompletion(MediaPlayer mp) {
+										if (playStatus) {
+											playStatus = false;
+										}
+										if (mAnitmation != null
+												&& mAnitmation.isRunning()) {
+											mAnitmation.stop();
+										}
+										if (data.getIsFromMyself()) {
+											tmpView.setBackgroundResource(R.drawable.right_audio3);
+										} else {
+											tmpView.setBackgroundResource(R.drawable.left_audio3);
+										}
+									}
+								});
 						// 设置动画
-						if (holder.imgVoiceSrc != null) {
-							if (data.getIsFromMyself()) {
-								holder.imgVoiceSrc.setBackgroundResource(R.anim.im_right_voice);
-								// holder.imgVoiceSrc.setImageResource(R.anim.im_right_voice);
-							} else {
-								holder.imgVoiceSrc.setBackgroundResource(R.anim.im_left_voice);
-								// holder.imgVoiceSrc.setImageResource(R.anim.im_left_voice);
-							}
-							mAnitmation = (AnimationDrawable) holder.imgVoiceSrc.getBackground();
-							mAnitmation.setOneShot(false);
-							if (!mAnitmation.isRunning()) {
-								mAnitmation.start();
-							}
+
+						if (data.getIsFromMyself()) {
+							v.setBackgroundResource(R.anim.im_right_voice);
+						} else {
+							v.setBackgroundResource(R.anim.im_left_voice);
+						}
+						mAnitmation = (AnimationDrawable) v.getBackground();
+						mAnitmation.setOneShot(false);
+						if (!mAnitmation.isRunning()) {
+							mAnitmation.start();
 						}
 
 					} catch (IllegalArgumentException e) {

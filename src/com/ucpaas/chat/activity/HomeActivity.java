@@ -13,6 +13,8 @@ import com.ucpaas.chat.fragment.ContactFragment;
 import com.ucpaas.chat.fragment.ConversationListFragment;
 import com.ucpaas.chat.fragment.MeFragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
@@ -133,4 +135,16 @@ public class HomeActivity extends BaseFragmentActivity implements OnCheckedChang
 		return super.onKeyDown(keyCode, event);
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 1000) {
+			if (resultCode == Activity.RESULT_OK) {
+				String titleName = data.getExtras().getString("ConversationTitle");
+				mFirstFragment.refreshData(titleName);
+			}
+
+		}
+	}
+
+	
 }
