@@ -1,6 +1,10 @@
 package com.ucpaas.chat.util;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.style.ImageSpan;
 
 import com.ucpaas.chat.R;
@@ -19,18 +24,22 @@ import com.ucpaas.chat.R;
  * @author msquirrel
  * 
  */
-public class ExpressionUtil {
-	private static ExpressionUtil intense;
 
-	public static ExpressionUtil getIntense() {
-		if (intense == null)
-			intense = new ExpressionUtil();
-		return intense;
+public class ExpressionUtil {
+	private static ExpressionUtil intstace;
+
+	public static ExpressionUtil getInstace() {
+		if (intstace == null)
+			intstace = new ExpressionUtil();
+		return intstace;
 	}
 
 	private ExpressionUtil() {
 	}
 
+	
+	private HashMap<String, String> mapExpression = null;
+	
 	/**
 	 * 本地表情的资源ID
 	 */
@@ -97,8 +106,15 @@ public class ExpressionUtil {
 			if (matcher.start() < start) {
 				continue;
 			}
-			Field field = R.drawable.class.getDeclaredField(key);
-			int resId = Integer.parseInt(field.get(null).toString());
+			if (mapExpression == null) {
+				mapExpression = getExpressionMap();
+			}
+			
+			int resId = Integer.parseInt(mapExpression.get(key));
+//	        int resId = context.getResources().getIdentifier(value, "drawable",  
+//	                    context.getPackageName());  
+//			Field field = R.drawable.class.getDeclaredField(key);
+//			int resId = Integer.parseInt(field.get(null).toString());
 			if (resId != 0) {
 				Bitmap bitmap = BitmapFactory.decodeResource(
 						context.getResources(), resId);
@@ -114,6 +130,22 @@ public class ExpressionUtil {
 		}
 	}
 
+	private HashMap<String, String> getExpressionMap() {
+		HashMap<String, String> mapData = new HashMap<String, String>();
+
+		for (int i = 0; i < expressionImgNames.length; i++) {
+			mapData.put(expressionImgNames[i], expressionImgs[i] + "");
+		}
+		for (int i = 0; i < expressionImgNames1.length; i++) {
+			mapData.put(expressionImgNames1[i], expressionImgs1[i] + "");
+		}
+		for (int i = 0; i < expressionImgNames2.length; i++) {
+			mapData.put(expressionImgNames2[i], expressionImgs2[i] + "");
+		}
+		
+		return mapData;
+	}
+
 	/**
 	 * 判断传入str里是否有图片，有图片就表情图片代�? *
 	 * 
@@ -122,9 +154,10 @@ public class ExpressionUtil {
 	 * @param zhengze正则表达
 	 *            �? * @return
 	 */
-	public SpannableString getExpressionString(Context context, String str,
-			String zhengze) {
+	public SpannableString getExpressionString(Context context, String str) {
 		SpannableString spannableString = new SpannableString(str);
+		String zhengze = "\\[f[0][0-9][0-9]\\]";
+//		String zhengze = "\\[f([0-9])|([1-9][0-9])|100\\]";
 		Pattern sinaPatten = Pattern.compile(zhengze, Pattern.CASE_INSENSITIVE); // 通过传入的正则表达式来生成一个pattern
 		try {
 			dealExpression(context, spannableString, sinaPatten, 0);
@@ -132,4 +165,27 @@ public class ExpressionUtil {
 		}
 		return spannableString;
 	}
+	
+	 /** 
+     * 添加表情 
+     *  
+     * @param context 
+     * @param imgId 
+     * @param spannableString 
+     * @return 
+     */  
+    public SpannableString addFace(Context context, int imgId,  
+            String spannableString) {  
+        if (TextUtils.isEmpty(spannableString)) {  
+            return null;  
+        }  
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),  
+                imgId);  
+        bitmap = Bitmap.createScaledBitmap(bitmap, 35, 35, true);  
+        ImageSpan imageSpan = new ImageSpan(context, bitmap);  
+        SpannableString spannable = new SpannableString(spannableString);  
+        spannable.setSpan(imageSpan, 0, spannableString.length(),  
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);  
+        return spannable;  
+    }  
 }

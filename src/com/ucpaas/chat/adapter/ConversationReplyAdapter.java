@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.activity.ImageActivity;
+import com.ucpaas.chat.util.ExpressionUtil;
 import com.ucpaas.chat.util.ImageLoaderUtils;
 import com.yzxIM.data.MSGTYPE;
 import com.yzxIM.data.db.ChatMessage;
@@ -191,7 +193,11 @@ public class ConversationReplyAdapter extends BaseAdapter {
 
 		// 文本消息
 		if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_TEXT || chatMessage.getMsgType() == MSGTYPE.MSG_DATA_SYSTEM) {
-			holder.replyContent.setText(chatMessage.getContent());
+
+			// 填充表情
+			SpannableString span = ExpressionUtil.getInstace().getExpressionString(mContext, chatMessage.getContent());
+			holder.replyContent.setText(span);
+
 			// 图片消息
 		} else if (chatMessage.getMsgType() == MSGTYPE.MSG_DATA_IMAGE) {
 			ImageLoaderUtils.displaySdcardImg(chatMessage.getContent(), holder.replyImgSmall);
