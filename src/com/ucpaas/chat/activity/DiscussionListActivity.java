@@ -103,11 +103,13 @@ public class DiscussionListActivity extends BaseActivity implements OnItemClickL
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 		// TODO Auto-generated method stub
-		ConversationInfo conversationInfo = mConversationInfoList.get(position);
-		DiscussionInfo discussionInfo = mIMManager.getDiscussionInfo(new String(conversationInfo.getTargetId()));
-		mIMManager.quitDiscussionGroup(discussionInfo.getDiscussionId());
-		mConversationInfoList.remove(conversationInfo);
-		return true;
+		// ConversationInfo conversationInfo =
+		// mConversationInfoList.get(position);
+		// DiscussionInfo discussionInfo = mIMManager.getDiscussionInfo(new
+		// String(conversationInfo.getTargetId()));
+		// mIMManager.quitDiscussionGroup(discussionInfo.getDiscussionId());
+		// mConversationInfoList.remove(conversationInfo);
+		return false;
 	}
 
 	/**

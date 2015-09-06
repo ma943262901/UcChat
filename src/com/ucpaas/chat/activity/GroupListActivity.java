@@ -16,12 +16,16 @@ import com.ucpaas.chat.R;
 import com.ucpaas.chat.adapter.GroupListAdapter;
 import com.ucpaas.chat.base.BaseActivity;
 import com.ucpaas.chat.bean.GroupInfo;
+import com.ucpaas.chat.bean.ResultInfo;
+import com.ucpaas.chat.config.ResultCode;
+import com.ucpaas.chat.listener.ConfirmListener;
 import com.ucpaas.chat.support.RequestFactory;
 import com.ucpaas.chat.support.SpOperation;
 import com.ucpaas.chat.util.JSONUtils;
 import com.ucpaas.chat.util.OkHttpClientManager;
 import com.ucpaas.chat.util.OkHttpClientManager.ResultCallback;
 import com.ucpaas.chat.util.ToastUtil;
+import com.ucpaas.chat.view.EditDialog;
 import com.yzxIM.IMManager;
 import com.yzxIM.data.CategoryId;
 import com.yzxIM.data.db.ConversationInfo;
@@ -70,8 +74,13 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 		// TODO Auto-generated method stub
 		setTitle("群组列表");
 		showRightMenu();
+	}
 
-		getData();
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		sync();
 	}
 
 	@Override
@@ -79,7 +88,7 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.btn_menu:
-			addDiscussionGroup();
+			addGroup();
 			break;
 
 		default:
@@ -107,6 +116,13 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 		// TODO Auto-generated method stub
 		return true;
+	}
+
+	/**
+	 * 更新数据
+	 */
+	private void sync() {
+		getData();
 	}
 
 	/**
@@ -179,12 +195,59 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 					ToastUtil.show(GroupListActivity.this, msg);
 				}
 				mAdapter.setList(mGroupInfoList);
-				mAdapter.notifyDataSetChanged();
 			}
 		});
 	}
 
-	private void addDiscussionGroup() {
+	/**
+	 * 添加群组
+	 */
+	private void addGroup() {
 		// TODO Auto-generated method stub
+		EditDialog editDialog = new EditDialog(this, "创建群组", "");
+		editDialog.show();
+		editDialog.setConfirmListener(new ConfirmListener() {
+
+			@Override
+			public void confirm(String result) {
+				// TODO Auto-generated method stub
+				if (!TextUtils.isEmpty(result)) {
+					createGroup(result);
+				} else {
+					ToastUtil.show(GroupListActivity.this, "群组名不能为空");
+				}
+			}
+		});
 	}
+
+	/**
+	 * 创建群组
+	 * 
+	 * @param groupName
+	 */
+	private void createGroup(String groupName) {
+		String userId = SpOperation.getUserId(this);
+		String url = RequestFactory.getInstance().getCreateGroup(userId, groupName);
+		OkHttpClientManager.getAsyn(url, new ResultCallback<String>() {
+
+			@Override
+			public void onError(Request request, Exception e) {
+				// TODO Auto-generated method stub
+				ToastUtil.show(GroupListActivity.this, "创建群组失败");
+			}
+
+			@Override
+			public void onResponse(String response) {
+				// TODO Auto-generated method stub
+				ResultInfo resultInfo = JSONUtils.parseObject(response, ResultInfo.class);
+				if (resultInfo != null && ResultCode.OK.equals(resultInfo.getResult())) {
+					ToastUtil.show(GroupListActivity.this, "创建群组成功");
+					sync();
+				} else {
+					ToastUtil.show(GroupListActivity.this, "创建群组失败");
+				}
+			}
+		});
+	}
+
 }

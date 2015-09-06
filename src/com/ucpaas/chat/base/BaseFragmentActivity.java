@@ -2,6 +2,7 @@ package com.ucpaas.chat.base;
 
 import com.ucpaas.chat.R;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -50,4 +51,12 @@ public class BaseFragmentActivity extends FragmentActivity {
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	protected void onActivityResult(int arg0, int arg1, Intent arg2) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(arg0, arg1, arg2);
+	}
+	
+	
 }

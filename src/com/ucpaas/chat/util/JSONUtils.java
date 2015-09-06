@@ -43,11 +43,10 @@ public class JSONUtils {
 	 */
 	public static List<GroupInfo> parseGroupInfo(String paramString) {
 		List<GroupInfo> groupInfoList = new ArrayList<GroupInfo>();
-		List<UserInfo> userInfoList = new ArrayList<UserInfo>();
 		try {
 			JSONArray groupJsonArray = JSONArray.parseArray(paramString);
 			JSONArray userJsonArray;
-			for (int i = 0; i < groupJsonArray.size(); ++i) {
+			for (int i = 0; i < groupJsonArray.size(); i++) {
 				GroupInfo groupInfo = new GroupInfo();
 				JSONObject groupJsonObject = (JSONObject) groupJsonArray.get(i);
 				groupInfo.setGroupicon(groupJsonObject.getString("groupicon"));
@@ -55,10 +54,11 @@ public class JSONUtils {
 				groupInfo.setGroupName(groupJsonObject.getString("groupname"));
 				userJsonArray = groupJsonObject.getJSONArray("userlist");
 
+				List<UserInfo> userInfoList = new ArrayList<UserInfo>();
 				if (userJsonArray != null) {
 					for (int j = 0; j < userJsonArray.size(); j++) {
 						UserInfo userInfo = new UserInfo();
-						JSONObject userJsonObject = (JSONObject) userJsonArray.get(i);
+						JSONObject userJsonObject = (JSONObject) userJsonArray.get(j);
 						userInfo.setNickname(userJsonObject.getString("nickname"));
 						userInfo.setPhone(userJsonObject.getString("phone"));
 						userInfo.setPortraituri(userJsonObject.getString("portraituri"));

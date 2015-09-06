@@ -84,6 +84,59 @@ public class RequestFactory {
 	 * @param userName
 	 * @return
 	 */
+	public String getCreateGroup(String userName, String groupName) {
+		String action = AppConstants.ACTION_CREATE_GROUP;
+
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("userId", userName);
+		params.put("groupName", groupName);
+
+		String url = getRequestUrl(action, params);
+		return url;
+	}
+
+	/**
+	 * 加入群组
+	 * 
+	 * @param userName
+	 * @param groupId
+	 * @return
+	 */
+	public String getJoinGroup(String userName, String groupId) {
+		String action = AppConstants.ACTION_JOIN_GROUP;
+
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("userId", userName);
+		params.put("groupId", groupId);
+
+		String url = getRequestUrl(action, params);
+		return url;
+	}
+
+	/**
+	 * 退出群组
+	 * 
+	 * @param userName
+	 * @param groupId
+	 * @return
+	 */
+	public String getQuitGroup(String userName, String groupId) {
+		String action = AppConstants.ACTION_QUIT_GROUP;
+
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("userId", userName);
+		params.put("groupId", groupId);
+
+		String url = getRequestUrl(action, params);
+		return url;
+	}
+
+	/**
+	 * 查询群组
+	 * 
+	 * @param userName
+	 * @return
+	 */
 	public String getQueryGroup(String userName) {
 		String action = AppConstants.ACTION_QUERY_GROUP;
 

@@ -15,13 +15,20 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.squareup.okhttp.Request;
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.adapter.DiscussionAddAdapter;
 import com.ucpaas.chat.base.BaseActivity;
+import com.ucpaas.chat.bean.ResultInfo;
 import com.ucpaas.chat.bean.UserInfo;
+import com.ucpaas.chat.config.ResultCode;
 import com.ucpaas.chat.db.ContactDb;
 import com.ucpaas.chat.db.impl.ContactDbImpl;
+import com.ucpaas.chat.support.RequestFactory;
 import com.ucpaas.chat.support.SpOperation;
+import com.ucpaas.chat.util.JSONUtils;
+import com.ucpaas.chat.util.OkHttpClientManager;
+import com.ucpaas.chat.util.OkHttpClientManager.ResultCallback;
 import com.ucpaas.chat.util.ToastUtil;
 import com.yzxIM.IMManager;
 
@@ -43,6 +50,7 @@ public class DiscussionAddActivity extends BaseActivity implements OnItemClickLi
 	private String mTitle;
 	private String mMembers;
 	private String mDiscussionId;
+	private String mGroupId;
 
 	@Override
 	public void setContentLayout() {
@@ -51,6 +59,7 @@ public class DiscussionAddActivity extends BaseActivity implements OnItemClickLi
 		mTitle = getIntent().getStringExtra("title");
 		mMembers = getIntent().getStringExtra("members");
 		mDiscussionId = getIntent().getStringExtra("discussionId");
+		mGroupId = getIntent().getStringExtra("groupId");
 	}
 
 	@Override
@@ -121,33 +130,73 @@ public class DiscussionAddActivity extends BaseActivity implements OnItemClickLi
 			if (mMembers != null) {
 				// 讨论组邀请成员
 				if (mDiscussionId != null) {
-					mIMManager.addDiscussionGroupMember(mDiscussionId, memberList);
-					Intent intent = new Intent();
+					addDiscussionMember(memberList);
+				}
 
-					StringBuilder stringBuilder = new StringBuilder();
-					for (String string : memberList) {
-						stringBuilder.append(string + ",");
+				// 群组邀请成员
+				if (mGroupId != null) {
+					if (memberList.size() == 1) {
+						addGroupMember(memberList.get(0));
+					} else {
+						ToastUtil.show(this, "每次只能添加一名成员");
 					}
-
-					Intent dataIntent = new Intent();
-					dataIntent.putExtra("data", stringBuilder.toString());
-					setResult(RESULT_OK, dataIntent);
 				}
 			} else {
 				// 创建讨论组
 				mIMManager.createDiscussionGroup(sb.toString(), memberList);
+				finish();
 			}
-			finish();
+
 		} else {
 			ToastUtil.show(this, "至少选择一名好友");
 		}
 	}
 
-	private void createDiscussionGroup() {
+	/**
+	 * 增加讨论组成员
+	 * 
+	 * @param memberList
+	 */
+	private void addDiscussionMember(List<String> memberList) {
+		mIMManager.addDiscussionGroupMember(mDiscussionId, memberList);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (String string : memberList) {
+			stringBuilder.append(string + ",");
+		}
+
+		Intent dataIntent = new Intent();
+		dataIntent.putExtra("data", stringBuilder.toString());
+		setResult(RESULT_OK, dataIntent);
+		finish();
+	}
+
+	/**
+	 * 添加群组成员
+	 */
+	private void addGroupMember(final String userId) {
 		// TODO Auto-generated method stub
-		List<String> memberList = new ArrayList<String>();
-		memberList.add("15019288493");
-		mIMManager.createDiscussionGroup("上沙椰树村", memberList);
+		String url = RequestFactory.getInstance().getJoinGroup(userId, mGroupId);
+		OkHttpClientManager.getAsyn(url, new ResultCallback<String>() {
+
+			@Override
+			public void onError(Request request, Exception e) {
+				// TODO Auto-generated method stub
+				ToastUtil.show(DiscussionAddActivity.this, "添加成员失败");
+			}
+
+			@Override
+			public void onResponse(String response) {
+				// TODO Auto-generated method stub
+				ResultInfo resultInfo = JSONUtils.parseObject(response, ResultInfo.class);
+				if (resultInfo != null && ResultCode.OK.equals(resultInfo.getResult())) {
+					ToastUtil.show(DiscussionAddActivity.this, "添加成员成功");
+					mMembers = mMembers + userId + ",";
+					mHandler.sendEmptyMessage(MSG_UPDATE_CONTACT);
+				} else {
+					ToastUtil.show(DiscussionAddActivity.this, "添加成员失败");
+				}
+			}
+		});
 	}
 
 	/**

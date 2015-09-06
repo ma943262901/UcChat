@@ -27,7 +27,7 @@ public class AppConstants {
 	/**
 	 * 创建群组
 	 */
-	public static final String ACTION_create_GROUP = "/user/createGroup.do";
+	public static final String ACTION_CREATE_GROUP = "/user/createGroup.do";
 
 	/**
 	 * 加入群组

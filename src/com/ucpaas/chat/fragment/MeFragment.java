@@ -1,5 +1,6 @@
 package com.ucpaas.chat.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ucpaas.chat.R;
+import com.ucpaas.chat.activity.AboutActivity;
+import com.ucpaas.chat.activity.FeedbackActivity;
 import com.ucpaas.chat.base.BaseFragment;
+import com.ucpaas.chat.support.SpOperation;
 
 /**
  * 我
@@ -46,6 +50,11 @@ public class MeFragment extends BaseFragment implements OnClickListener {
 	private void initView(View view) {
 		// TODO Auto-generated method stub
 		hideBackButton(view);
+		TextView tvUserName = (TextView) view.findViewById(R.id.tv_user_name);
+		TextView tvUserId = (TextView) view.findViewById(R.id.tv_user_id);
+		tvUserName.setText(SpOperation.getNickName(getActivity()));
+		tvUserId.setText(SpOperation.getUserId(getActivity()));
+
 		TextView mTitleView = (TextView) view.findViewById(R.id.tv_title);
 		mTitleView.setText(R.string.user_center);
 
@@ -66,11 +75,37 @@ public class MeFragment extends BaseFragment implements OnClickListener {
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
+
+		// 意见反馈
+		case R.id.ll_me_03:
+			feedback();
+			break;
+
+		// 关于
 		case R.id.ll_me_04:
-			return;
+			about();
+			break;
 
 		default:
 			break;
 		}
+	}
+
+	/**
+	 * 意见反馈
+	 */
+	private void feedback() {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(getActivity(), FeedbackActivity.class);
+		startActivity(intent);
+	}
+
+	/**
+	 * 关于
+	 */
+	private void about() {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(getActivity(), AboutActivity.class);
+		startActivity(intent);
 	}
 }

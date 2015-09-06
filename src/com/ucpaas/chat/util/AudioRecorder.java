@@ -54,7 +54,14 @@ public class AudioRecorder {
 
     public double getAmplitude() {
         if (mMediaRecorder != null) {
-            return (mMediaRecorder.getMaxAmplitude());
+        	try {
+        		return (mMediaRecorder.getMaxAmplitude());
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return 0;
+			}
+            
         } else
             return 0;
     }

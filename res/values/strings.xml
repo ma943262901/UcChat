@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">UcChat</string>
+    <string name="app_name">云信</string>
     <string name="action_settings">Settings</string>
     <string name="login_admin">请输入手机号</string>
     <string name="login_pwd">密码可为空</string>
@@ -16,7 +16,7 @@
     <string name="tab_fourth">我</string>
     <string name="settings">设置</string>
     <string name="collect">收藏</string>
-    <string name="feedback">用户反馈</string>
+    <string name="feedback">意见反馈</string>
     <string name="about">关于</string>
     <string name="user_name">东风解冻</string>
     <string name="wechat_name">QQ号：820012865</string>

@@ -34,6 +34,7 @@ public class GroupListAdapter extends BaseAdapter {
 
 	public void setList(List<GroupInfo> list) {
 		this.list = list;
+		notifyDataSetChanged();
 	}
 
 	public int getCount() {

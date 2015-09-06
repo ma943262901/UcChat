@@ -28,7 +28,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dip"
             android:singleLine="true"
-            android:text="云之讯"
             android:textColor="@color/gray_text"
             android:textSize="@dimen/content_size" />
     </LinearLayout>

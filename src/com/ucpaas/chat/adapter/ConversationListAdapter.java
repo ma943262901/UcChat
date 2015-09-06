@@ -32,12 +32,18 @@ public class ConversationListAdapter extends BaseAdapter {
 	private Context context;
 	private List<ConversationInfo> list;
 
+	private String mTitle = null;
+	
 	public ConversationListAdapter(Context context, List<ConversationInfo> list) {
 		super();
 		this.context = context;
 		this.list = list;
 	}
 
+	public void setActivityBackTitleName(String name){
+		mTitle = name;
+	}
+	
 	public void setList(List<ConversationInfo> list) {
 		this.list = list;
 	}
@@ -61,13 +67,22 @@ public class ConversationListAdapter extends BaseAdapter {
 		ConversationInfo conversationInfo = getItem(position);
 		ViewHolder holder = null;
 		if (convertView == null) {
-			convertView = LayoutInflater.from(context).inflate(R.layout.listitem_conversation, null);
+			convertView = LayoutInflater.from(context).inflate(
+					R.layout.listitem_conversation, null);
 			holder = new ViewHolder();
-			holder.image = (ImageView) convertView.findViewById(R.id.imv_conversation);
-			holder.tvTitle = (TextView) convertView.findViewById(R.id.tv_conversation_title);
-			holder.tvDesc = (TextView) convertView.findViewById(R.id.tv_conversation_desc);
-			holder.tvLastTime = (TextView) convertView.findViewById(R.id.tv_last_time);
+			holder.image = (ImageView) convertView
+					.findViewById(R.id.imv_conversation);
+			holder.tvTitle = (TextView) convertView
+					.findViewById(R.id.tv_conversation_title);
+			holder.tvDesc = (TextView) convertView
+					.findViewById(R.id.tv_conversation_desc);
+			holder.tvLastTime = (TextView) convertView
+					.findViewById(R.id.tv_last_time);
 
+			holder.imgUpdateTips = (ImageView) convertView
+					.findViewById(R.id.img_update);
+			holder.txvUnreadMsgNum = (TextView) convertView
+					.findViewById(R.id.txtv_unread_msg_num);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
@@ -84,7 +99,8 @@ public class ConversationListAdapter extends BaseAdapter {
 		}
 
 		holder.tvTitle.setText(conversationInfo.getConversationTitle());
-		holder.tvLastTime.setText(DateUtil.format(DateUtil.MMDD_HHMM, conversationInfo.getLastTime()));
+		holder.tvLastTime.setText(DateUtil.format(DateUtil.MMDD_HHMM,
+				conversationInfo.getLastTime()));
 
 		List<ChatMessage> currentMsgList = new ArrayList<ChatMessage>();
 		try {
@@ -104,6 +120,30 @@ public class ConversationListAdapter extends BaseAdapter {
 					holder.tvDesc.setText(lastContent);
 				}
 			}
+			int unReadNum = conversationInfo.getMsgUnRead();
+			int Count = conversationInfo.getUnreadCount();
+			if (mTitle != null && conversationInfo.getConversationTitle().equals(mTitle)) {
+				holder.txvUnreadMsgNum.setText(0 + "");
+				holder.imgUpdateTips.setVisibility(View.GONE);
+				holder.txvUnreadMsgNum.setVisibility(View.GONE);
+			}else {
+				if (unReadNum <= 0) {
+					holder.txvUnreadMsgNum.setText(0 + "");
+					holder.imgUpdateTips.setVisibility(View.GONE);
+					holder.txvUnreadMsgNum.setVisibility(View.GONE);
+				}else if (unReadNum > 0 && unReadNum <= 99) {
+					holder.imgUpdateTips.setVisibility(View.VISIBLE);
+					holder.txvUnreadMsgNum.setVisibility(View.VISIBLE);
+					holder.txvUnreadMsgNum.setText(unReadNum + "");
+
+				} else if (unReadNum > 99) {
+					holder.imgUpdateTips.setVisibility(View.VISIBLE);
+					holder.txvUnreadMsgNum.setVisibility(View.VISIBLE);
+					holder.txvUnreadMsgNum.setText(99+ "");
+				}
+			}
+
+
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -114,6 +154,8 @@ public class ConversationListAdapter extends BaseAdapter {
 	static class ViewHolder {
 		ImageView image;
 		TextView tvTitle, tvDesc, tvLastTime;
+		ImageView imgUpdateTips;
+		TextView txvUnreadMsgNum;
 	}
 
 }

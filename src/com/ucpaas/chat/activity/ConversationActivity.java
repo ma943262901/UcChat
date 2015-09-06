@@ -53,9 +53,11 @@ import android.widget.Toast;
 
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.adapter.ConversationReplyAdapter;
+import com.ucpaas.chat.config.ResultCode;
 import com.ucpaas.chat.support.SpOperation;
 import com.ucpaas.chat.util.AudioRecorder;
 import com.ucpaas.chat.util.ExpressionUtil;
+import com.ucpaas.chat.util.KeyBoardUtils;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.ToastUtil;
 import com.yzxIM.IMManager;
@@ -89,6 +91,7 @@ public class ConversationActivity extends Activity implements MessageListener, O
 	private String mUserId;
 	private static final int REQUEST_CODE_IMAGE = 1;
 	private static final int REQUEST_CODE_DISCUSSION = 2;
+	private static final int REQUEST_CODE_GROUP = 3;
 
 	@SuppressLint("HandlerLeak")
 	private Handler mHandler = new Handler() {
@@ -108,12 +111,17 @@ public class ConversationActivity extends Activity implements MessageListener, O
 		mIMManager.setSendMsgListener(this);
 		mConversationInfo = (ConversationInfo) getIntent().getSerializableExtra("conversation");
 		mChatMessages = mConversationInfo.getAllMessage();
+
 		mUserId = SpOperation.getUserId(this);
 
 		initView();
 		mAdapter = new ConversationReplyAdapter(ConversationActivity.this, mChatMessages);
 		mListView.setAdapter(mAdapter);
 		sync();
+
+		Intent intent = new Intent();
+		intent.putExtra("ConversationTitle", mConversationInfo.getConversationTitle());
+		setResult(Activity.RESULT_OK, intent);
 	}
 
 	private void initView() {
@@ -332,14 +340,29 @@ public class ConversationActivity extends Activity implements MessageListener, O
 		mSendBtn.setOnClickListener(this);
 		mInputEdit = (EditText) findViewById(R.id.fb_send_content);
 
+		mInputEdit.setOnTouchListener(new OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				im_ll_more.setVisibility(View.GONE);
+				im_ll_images.setVisibility(View.GONE);
+				im_ll_record.setVisibility(View.GONE);
+				return false;
+			}
+		});
+
 		mInputEdit.setOnFocusChangeListener(new OnFocusChangeListener() {
 
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				// 隐藏其他布局
-				im_ll_more.setVisibility(View.GONE);
-				im_ll_images.setVisibility(View.GONE);
-				im_ll_record.setVisibility(View.GONE);
+				if (hasFocus) {
+					im_ll_more.setVisibility(View.GONE);
+					im_ll_images.setVisibility(View.GONE);
+					im_ll_record.setVisibility(View.GONE);
+					KeyBoardUtils.openKeybord(mInputEdit, mContext);
+				}
+
 			}
 		});
 
@@ -347,8 +370,10 @@ public class ConversationActivity extends Activity implements MessageListener, O
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				// TODO Auto-generated method stub
-
+				if (mInputEdit.getText().toString().equals("")) {
+					mSendBtn.setVisibility(View.GONE);
+					mBtnMore.setVisibility(View.VISIBLE);
+				}
 			}
 
 			@Override
@@ -359,10 +384,13 @@ public class ConversationActivity extends Activity implements MessageListener, O
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if (mSendBtn.getVisibility() != View.VISIBLE) {
-					mSendBtn.setVisibility(View.VISIBLE);
-					mBtnMore.setVisibility(View.GONE);
+				if (!mInputEdit.getText().toString().equals("")) {
+					if (mSendBtn.getVisibility() != View.VISIBLE) {
+						mSendBtn.setVisibility(View.VISIBLE);
+						mBtnMore.setVisibility(View.GONE);
+					}
 				}
+
 			}
 		});
 
@@ -849,17 +877,22 @@ public class ConversationActivity extends Activity implements MessageListener, O
 				im_ll_images.setVisibility(View.GONE);
 				im_ll_record.setVisibility(View.VISIBLE);
 			}
+			KeyBoardUtils.closeKeybord(mInputEdit, mContext);
 		}
 			break;
 		// 表情按钮
 		case R.id.im_expression_image: {
 			if (im_ll_images.getVisibility() == View.VISIBLE) {
 				im_ll_images.setVisibility(View.GONE);
+				KeyBoardUtils.openKeybord(mInputEdit, mContext);
 			} else {
+				KeyBoardUtils.closeKeybord(mInputEdit, mContext);
 				im_ll_more.setVisibility(View.GONE);
 				im_ll_record.setVisibility(View.GONE);
 				im_ll_images.setVisibility(View.VISIBLE);
+
 			}
+
 		}
 			break;
 		// 更多按钮
@@ -871,6 +904,7 @@ public class ConversationActivity extends Activity implements MessageListener, O
 				im_ll_images.setVisibility(View.GONE);
 				im_ll_more.setVisibility(View.VISIBLE);
 			}
+			KeyBoardUtils.closeKeybord(mInputEdit, mContext);
 
 		}
 			break;
@@ -900,13 +934,17 @@ public class ConversationActivity extends Activity implements MessageListener, O
 		// TODO Auto-generated method stub
 		Intent intent = null;
 		if (CategoryId.PERSONAL == mConversationInfo.getCategoryId()) {
-
+			// 单聊
 		} else if (CategoryId.DISCUSSION == mConversationInfo.getCategoryId()) {
+			// 讨论组
 			intent = new Intent(this, DiscussionDetailActivity.class);
 			intent.putExtra("conversation", mConversationInfo);
 			startActivityForResult(intent, REQUEST_CODE_DISCUSSION);
 		} else if (CategoryId.GROUP == mConversationInfo.getCategoryId()) {
-
+			// 群组
+			intent = new Intent(this, GroupDetailActivity.class);
+			intent.putExtra("conversation", mConversationInfo);
+			startActivityForResult(intent, REQUEST_CODE_GROUP);
 		}
 	}
 
@@ -937,15 +975,23 @@ public class ConversationActivity extends Activity implements MessageListener, O
 					sendImageMessage(path, path);
 				}
 			}
-
 			break;
 
 		case REQUEST_CODE_DISCUSSION:
 			if (resultCode == Activity.RESULT_OK) {
+				// 退出
 				finish();
-			} else if (resultCode == 1) {
+			} else if (resultCode == ResultCode.TITLE) {
+				// 修改讨论组标题
 				String title = data.getStringExtra("title");
 				mTitleView.setText(title);
+			}
+			break;
+
+		case REQUEST_CODE_GROUP:
+			if (resultCode == Activity.RESULT_OK) {
+				// 退出
+				finish();
 			}
 			break;
 
@@ -953,6 +999,12 @@ public class ConversationActivity extends Activity implements MessageListener, O
 			break;
 		}
 
+	}
+
+	@Override
+	protected void onPause() {
+		super.onDestroy();
+		KeyBoardUtils.closeKeybord(mInputEdit, mContext);
 	}
 
 }

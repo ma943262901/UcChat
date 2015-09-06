@@ -11,4 +11,5 @@ package com.ucpaas.chat.config;
 public class ResultCode {
 	
 	public final static String OK = "0";
+	public final static int TITLE = 1;
 }

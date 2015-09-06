@@ -20,6 +20,7 @@ import com.ucpaas.chat.R;
 import com.ucpaas.chat.adapter.DiscussionGridAdapter;
 import com.ucpaas.chat.base.BaseActivity;
 import com.ucpaas.chat.bean.UserInfo;
+import com.ucpaas.chat.config.ResultCode;
 import com.ucpaas.chat.listener.ConfirmListener;
 import com.ucpaas.chat.util.LogUtil;
 import com.ucpaas.chat.util.ToastUtil;
@@ -228,7 +229,7 @@ public class DiscussionDetailActivity extends BaseActivity implements OnItemClic
 					mTvImName.setText(result);
 					Intent data = new Intent();
 					data.putExtra("title", result);
-					setResult(1, data);
+					setResult(ResultCode.TITLE, data);
 					ToastUtil.show(DiscussionDetailActivity.this, "修改成功");
 				} else {
 					ToastUtil.show(DiscussionDetailActivity.this, "名字不能为空");

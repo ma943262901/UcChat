@@ -3,10 +3,12 @@ package com.ucpaas.chat.fragment;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings.Global;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +51,7 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 	private ConversationListAdapter mAdapter;
 	private List<ConversationInfo> mConversationLists;
 
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -88,9 +91,12 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// TODO Auto-generated method stub
 		ConversationInfo conversationinfo = mConversationLists.get(position);
+		// 清除未读消息标记
+		mIMManager.clearMessagesUnreadStatus(conversationinfo);
+		mConversationLists.get(position).setMsgUnRead(0);
 		Intent intent = new Intent(getActivity(), ConversationActivity.class);
 		intent.putExtra("conversation", conversationinfo);
-		startActivity(intent);
+		getActivity().startActivityForResult(intent, 1000);;
 	}
 
 	/**
@@ -145,6 +151,8 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 
 		// 把cinfo添加到会话列表中，更新界面
 		mConversationLists.add(cinfo);
+		int mm  = cinfo.getMsgUnRead();
+		int nn = cinfo.getUnreadCount();
 		sync();
 	}
 
@@ -195,6 +203,7 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 				mConversationLists.add(0, cinfoSrc);
 			}
 
+			int num = cinfoSrc.getMsgUnRead();
 			sync();
 		}
 	}
@@ -240,5 +249,10 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 	public int compare(ConversationInfo lhs, ConversationInfo rhs) {
 		// TODO Auto-generated method stub
 		return lhs.getLastTime() >= rhs.getLastTime() ? -1 : 1;
+	}
+	
+	public void refreshData(String titleName){
+		mAdapter.setActivityBackTitleName(titleName);
+		mAdapter.notifyDataSetChanged();
 	}
 }

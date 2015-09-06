@@ -4,6 +4,7 @@ package com.ucpaas.chat.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,17 +14,22 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.squareup.okhttp.Request;
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.adapter.DiscussionGridAdapter;
 import com.ucpaas.chat.base.BaseActivity;
+import com.ucpaas.chat.bean.GroupInfo;
+import com.ucpaas.chat.bean.ResultInfo;
 import com.ucpaas.chat.bean.UserInfo;
-import com.ucpaas.chat.listener.ConfirmListener;
-import com.ucpaas.chat.util.LogUtil;
+import com.ucpaas.chat.config.ResultCode;
+import com.ucpaas.chat.support.RequestFactory;
+import com.ucpaas.chat.support.SpOperation;
+import com.ucpaas.chat.util.JSONUtils;
+import com.ucpaas.chat.util.OkHttpClientManager;
+import com.ucpaas.chat.util.OkHttpClientManager.ResultCallback;
 import com.ucpaas.chat.util.ToastUtil;
-import com.ucpaas.chat.view.EditDialog;
 import com.yzxIM.IMManager;
 import com.yzxIM.data.db.ConversationInfo;
-import com.yzxIM.data.db.DiscussionInfo;
 
 /**
  * 群组详情
@@ -34,19 +40,20 @@ import com.yzxIM.data.db.DiscussionInfo;
 
 public class GroupDetailActivity extends BaseActivity implements OnItemClickListener {
 
+	private TextView mTvImName;
 	private GridView mGridView;
-	private DiscussionGridAdapter mAdpater;
+	private DiscussionGridAdapter mAdapter;
+
 	private ConversationInfo mConversationInfo;
 	private IMManager mIMManager;
-	private DiscussionInfo mDiscussionInfo;
-	private List<UserInfo> mUserInfo;
-
-	private TextView mTvImName;
+	private List<GroupInfo> mGroupInfoList;
+	private List<UserInfo> mUserInfoList;
+	private GroupInfo mGroupInfo;
 
 	@Override
 	public void setContentLayout() {
 		// TODO Auto-generated method stub
-		setContentView(R.layout.activity_discussion_detail);
+		setContentView(R.layout.activity_group_detail);
 	}
 
 	@Override
@@ -54,14 +61,7 @@ public class GroupDetailActivity extends BaseActivity implements OnItemClickList
 		// TODO Auto-generated method stub
 		mConversationInfo = (ConversationInfo) getIntent().getSerializableExtra("conversation");
 		mIMManager = IMManager.getInstance(this);
-		if (mConversationInfo != null) {
-			mDiscussionInfo = mIMManager.getDiscussionInfo(mConversationInfo.getTargetId());
-			String members = mDiscussionInfo.getDiscussionMembers();
-			mUserInfo = getUserInfoList(members);
-			LogUtil.log("members:" + members);
-		} else {
-			mUserInfo = new ArrayList<UserInfo>();
-		}
+		mUserInfoList = new ArrayList<UserInfo>();
 	}
 
 	@Override
@@ -76,21 +76,26 @@ public class GroupDetailActivity extends BaseActivity implements OnItemClickList
 		LinearLayout llImName = (LinearLayout) findViewById(R.id.ll_im_name);
 		llImName.setOnClickListener(this);
 		mTvImName = (TextView) findViewById(R.id.tv_im_name);
-		if (mDiscussionInfo != null) {
-			mTvImName.setText(mDiscussionInfo.getDiscussionName());
-		}
+		mTvImName.setText(mConversationInfo.getConversationTitle());
 
 		// 成员
 		mGridView = (GridView) findViewById(R.id.gv_im_member);
-		mAdpater = new DiscussionGridAdapter(this, mUserInfo);
-		mGridView.setAdapter(mAdpater);
+		mAdapter = new DiscussionGridAdapter(this, mUserInfoList);
+		mGridView.setAdapter(mAdapter);
 		mGridView.setOnItemClickListener(this);
 	}
 
 	@Override
 	public void afterInitView() {
 		// TODO Auto-generated method stub
-		setTitle("讨论组详情");
+		setTitle("群组详情");
+	}
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		sync();
 	}
 
 	@Override
@@ -98,11 +103,10 @@ public class GroupDetailActivity extends BaseActivity implements OnItemClickList
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.ll_im_name:
-			midifyImName();
 			break;
 
 		case R.id.btn_im_detail_exit:
-			exitDiscussion();
+			exitGroup();
 			break;
 
 		default:
@@ -111,65 +115,129 @@ public class GroupDetailActivity extends BaseActivity implements OnItemClickList
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+	public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
 		// TODO Auto-generated method stub
-		ToastUtil.show(this, "position:" + arg2);
+		if (position == parent.getAdapter().getCount() - 1) {
+			// 增加讨论组成员
+			addUserInfo();
+		}
 	}
 
 	/**
-	 * 修改讨论组名字
+	 * 增加讨论组成员
 	 */
-	private void midifyImName() {
-		// TODO Auto-generated method stub
-		String oldName = mTvImName.getText().toString();
-		EditDialog editDialog = new EditDialog(this, "修改讨论组名字", oldName);
-		editDialog.show();
-		editDialog.setConfirmListener(new ConfirmListener() {
+	private void addUserInfo() {
+		StringBuilder sb = new StringBuilder();
+		if (mGroupInfo != null && mUserInfoList != null && mUserInfoList.size() != 0) {
+			for (UserInfo UserInfo : mUserInfoList) {
+				sb.append(UserInfo.getPhone() + ",");
+			}
+
+			Intent intent = new Intent(GroupDetailActivity.this, DiscussionAddActivity.class);
+			intent.putExtra("groupId", mGroupInfo.getGroupID());
+			intent.putExtra("title", "邀请好友");
+			intent.putExtra("members", sb.toString());
+			startActivity(intent);
+		}
+	}
+
+	/**
+	 * 同步数据
+	 */
+	private void sync(){
+		getData();
+	}
+	
+	/**
+	 * 获取群组数据
+	 */
+	private void getData() {
+		String userName = SpOperation.getUserId(this);
+		String url = RequestFactory.getInstance().getQueryGroup(userName);
+		OkHttpClientManager.getAsyn(url, new ResultCallback<String>() {
 
 			@Override
-			public void confirm(String result) {
+			public void onError(Request request, Exception e) {
 				// TODO Auto-generated method stub
-				if (!TextUtils.isEmpty(result)) {
-					mIMManager.modifyDiscussionTitle(mDiscussionInfo.getDiscussionId(), result);
-					mTvImName.setText(result);
-					ToastUtil.show(GroupDetailActivity.this, "修改成功");
-				} else {
-					ToastUtil.show(GroupDetailActivity.this, "名字不能为空");
+				ToastUtil.show(GroupDetailActivity.this, "查询失败");
+			}
+
+			@Override
+			public void onResponse(String response) {
+				// TODO Auto-generated method stub
+				// ToastUtil.show(GroupListActivity.this, "查询成功");
+				mGroupInfoList = JSONUtils.parseGroupInfo(response);
+				if (mGroupInfoList != null) {
+					for (GroupInfo groupInfo : mGroupInfoList) {
+						if (mConversationInfo.getTargetId().equals(groupInfo.getGroupID())) {
+							mGroupInfo = groupInfo;
+							mUserInfoList = groupInfo.getUserLists();
+							if (mUserInfoList == null) {
+								mUserInfoList = new ArrayList<UserInfo>();
+							}
+							sync(null);
+							break;
+						}
+					}
 				}
 			}
 		});
 	}
 
 	/**
-	 * 获取讨论组成员
+	 * 更新数据
 	 * 
-	 * @param members
-	 * @return
+	 * @param msg
 	 */
-	public List<UserInfo> getUserInfoList(String members) {
-		List<UserInfo> discussionMemberList = new ArrayList<UserInfo>();
+	private void sync(final String msg) {
+		runOnUiThread(new Runnable() {
 
-		if (!TextUtils.isEmpty(members)) {
-			String[] memberList = members.split(",");
-			if (memberList != null) {
-				for (String member : memberList) {
-					UserInfo userInfo = new UserInfo();
-					userInfo.setPhone(member);
-					discussionMemberList.add(userInfo);
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				if (!TextUtils.isEmpty(msg)) {
+					ToastUtil.show(GroupDetailActivity.this, msg);
 				}
+				mAdapter.setList(mUserInfoList);
+				mAdapter.notifyDataSetChanged();
 			}
-		}
-		return discussionMemberList;
+		});
 	}
 
 	/**
-	 * 退出讨论组
+	 * 退出群组
 	 */
-	private void exitDiscussion() {
+	private void exitGroup() {
 		// TODO Auto-generated method stub
-		mIMManager.quitDiscussionGroup(mDiscussionInfo.getDiscussionId());
-		ToastUtil.show(this, "退出成功");
-		finish();
-	}
+		if (mGroupInfo != null) {
+			String userName = SpOperation.getUserId(this);
+			String groupId = mGroupInfo.getGroupID();
+			String url = RequestFactory.getInstance().getQuitGroup(userName, groupId);
+			OkHttpClientManager.getAsyn(url, new ResultCallback<String>() {
 
+				@Override
+				public void onError(Request request, Exception e) {
+					// TODO Auto-generated method stub
+					ToastUtil.show(GroupDetailActivity.this, "退出群组失败");
+				}
+
+				@Override
+				public void onResponse(String response) {
+					// TODO Auto-generated method stub
+
+					ResultInfo resultInfo = JSONUtils.parseObject(response, ResultInfo.class);
+					if (resultInfo != null && ResultCode.OK.equals(resultInfo.getResult())) {
+						ToastUtil.show(GroupDetailActivity.this, "退出成功");
+						setResult(RESULT_OK);
+						mIMManager.clearMessages(mConversationInfo);
+						finish();
+					} else {
+						ToastUtil.show(GroupDetailActivity.this, "退出群组失败");
+					}
+				}
+			});
+
+		}
+
+	}
 }
