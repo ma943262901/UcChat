@@ -14,13 +14,13 @@
     <string name="tab_second">通信录</string>
     <string name="tab_third">发现</string>
     <string name="tab_fourth">我</string>
-    
-        <string name="settings">设置</string>
+    <string name="settings">设置</string>
     <string name="collect">收藏</string>
     <string name="feedback">用户反馈</string>
     <string name="about">关于</string>
     <string name="user_name">东风解冻</string>
     <string name="wechat_name">QQ号：820012865</string>
     <string name="user_center">个人中心</string>
+    <string name="notice">提示</string>
 
 </resources>

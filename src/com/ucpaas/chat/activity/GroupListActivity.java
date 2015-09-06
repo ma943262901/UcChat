@@ -52,7 +52,7 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 		// TODO Auto-generated method stub
 		mIMManager = IMManager.getInstance(this);
 		mGroupInfoList = new ArrayList<GroupInfo>();
-		mConversationInfoList = getDiscussionList();
+		mConversationInfoList = getGroupConversationList();
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// TODO Auto-generated method stub
 		GroupInfo groupInfo = mGroupInfoList.get(position);
-		ConversationInfo conversationInfo = getGroupConversation(groupInfo);
+		ConversationInfo conversationInfo = queryGroupConversation(groupInfo);
 		if (conversationInfo == null) {
 			conversationInfo = new ConversationInfo();
 			conversationInfo.setCategoryId(CategoryId.GROUP.ordinal());
@@ -109,7 +109,13 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 		return true;
 	}
 
-	private List<ConversationInfo> getDiscussionList() {
+	/**
+	 * 获取所有群组会话
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private List<ConversationInfo> getGroupConversationList() {
 		List<ConversationInfo> conversationInfoList = mIMManager.getConversationList(CategoryId.GROUP.ordinal());
 		if (conversationInfoList == null) {
 			conversationInfoList = new ArrayList<ConversationInfo>();
@@ -117,7 +123,13 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 		return conversationInfoList;
 	}
 
-	private ConversationInfo getGroupConversation(GroupInfo groupInfo) {
+	/**
+	 * 查询群组会话是否存在
+	 * 
+	 * @param groupInfo
+	 * @return
+	 */
+	private ConversationInfo queryGroupConversation(GroupInfo groupInfo) {
 		if (mConversationInfoList != null) {
 			for (ConversationInfo conversationInfo : mConversationInfoList) {
 				if (groupInfo.getGroupID().equals(conversationInfo.getTargetId())) {
@@ -128,6 +140,9 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 		return null;
 	}
 
+	/**
+	 * 获取群组数据
+	 */
 	private void getData() {
 		String userName = SpOperation.getUserId(this);
 		String url = RequestFactory.getInstance().getQueryGroup(userName);
@@ -149,6 +164,11 @@ public class GroupListActivity extends BaseActivity implements OnItemClickListen
 		});
 	}
 
+	/**
+	 * 更新数据
+	 * 
+	 * @param msg
+	 */
 	private void sync(final String msg) {
 		runOnUiThread(new Runnable() {
 

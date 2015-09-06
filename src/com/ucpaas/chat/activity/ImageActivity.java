@@ -101,6 +101,7 @@ public class ImageActivity extends Activity {
 		imageView.setDrawingCacheEnabled(false);
 	}
 
+	@SuppressWarnings("unused")
 	private void loadImage() {
 		// TODO Auto-generated method stub
 		ImageLoaderUtils.displayImg(url, imageView, new ImageLoadingListener() {

@@ -73,6 +73,10 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name="com.ucpaas.chat.activity.DiscussionDetailActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.ucpaas.chat.activity.GroupListActivity"
             android:screenOrientation="portrait" >
         </activity>

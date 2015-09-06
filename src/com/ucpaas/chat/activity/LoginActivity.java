@@ -131,15 +131,20 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			@Override
 			public void onResponse(String response) {
 				// TODO Auto-generated method stub
-				UserInfo userInfo = JSONUtils.parseObject(response, UserInfo.class);
 				LogUtil.log("response:" + response);
+				UserInfo userInfo = JSONUtils.parseObject(response, UserInfo.class);
 
-				if (ResultCode.OK.equals(userInfo.getResult())) {
-					loginSuccess(userInfo);
+				if (userInfo != null) {
+					if (ResultCode.OK.equals(userInfo.getResult())) {
+						loginSuccess(userInfo);
+					} else {
+						ToastUtil.show(LoginActivity.this, "手机号无效，请先注册");
+						loginFailure();
+					}
 				} else {
-					ToastUtil.show(LoginActivity.this, "手机号无效，请先注册");
-					loginFailure();
+					ToastUtil.show(LoginActivity.this, "网络错误");
 				}
+
 			}
 		});
 	}

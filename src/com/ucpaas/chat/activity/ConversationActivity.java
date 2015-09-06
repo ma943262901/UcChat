@@ -107,12 +107,18 @@ public class ConversationActivity extends Activity implements MessageListener, O
 		mAdapter = new ConversationReplyAdapter(ConversationActivity.this, mChatMessages);
 		mListView.setAdapter(mAdapter);
 		sync();
-
 	}
 
 	private void initView() {
+		// 标题
 		TextView mTitleView = (TextView) findViewById(R.id.tv_title);
 		mTitleView.setText(mConversationInfo.getConversationTitle());
+
+		// 会话详情
+		ImageView btnMenu = (ImageView) findViewById(R.id.btn_menu);
+		btnMenu.setImageResource(R.drawable.selector_btn_iminfo);
+		btnMenu.setVisibility(View.VISIBLE);
+		btnMenu.setOnClickListener(this);
 
 		ImageView mBackBtn = (ImageView) findViewById(R.id.btn_back);
 		mBackBtn.setVisibility(View.VISIBLE);
@@ -173,9 +179,9 @@ public class ConversationActivity extends Activity implements MessageListener, O
 		msg.setTargetId(mConversationInfo.getTargetId());
 		msg.setSenderId(mUserId);
 		msg.setMsgType(MSGTYPE.MSG_DATA_TEXT);
-		msg.setContent(content); 
+		msg.setContent(content);
 		LogUtil.log("sendMessage");
-		if (mIMManager.sendmessage(msg)) { 
+		if (mIMManager.sendmessage(msg)) {
 			// 发送成功后把消息添加到消息列表中，收到消息发送回调后刷新界面
 			// ToastUtil.show(this, "消息发送成功");
 
@@ -459,8 +465,7 @@ public class ConversationActivity extends Activity implements MessageListener, O
 
 	// 删除老文件
 	void deleteOldFile() {
-		File file = new File(Environment.getExternalStorageDirectory(), "WifiChat/voiceRecord/" + RECORD_FILENAME
-				+ ".amr");
+		File file = new File(Environment.getExternalStorageDirectory(), "WifiChat/voiceRecord/" + RECORD_FILENAME + ".amr");
 		if (file.exists()) {
 			file.delete();
 		}
@@ -471,8 +476,7 @@ public class ConversationActivity extends Activity implements MessageListener, O
 		if (mRecordDialog == null) {
 			mRecordDialog = new Dialog(ConversationActivity.this, R.style.DialogStyle);
 			mRecordDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			mRecordDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			mRecordDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			mRecordDialog.setContentView(R.layout.record_dialog);
 			mIvRecVolume = (ImageView) mRecordDialog.findViewById(R.id.record_dialog_img);
 			mTvRecordDialogTxt = (TextView) mRecordDialog.findViewById(R.id.record_dialog_txt);
@@ -650,8 +654,8 @@ public class ConversationActivity extends Activity implements MessageListener, O
 			listItem.put("image", eImages[i]);
 			listItems.add(listItem);
 		}
-		simpleAdapter = new SimpleAdapter(ConversationActivity.this, listItems, R.layout.single_expression,
-				new String[] { "image" }, new int[] { R.id.image });
+		simpleAdapter = new SimpleAdapter(ConversationActivity.this, listItems, R.layout.single_expression, new String[] { "image" },
+				new int[] { R.id.image });
 		gView1.setAdapter(simpleAdapter);
 		grids.add(gView1);
 
@@ -743,8 +747,8 @@ public class ConversationActivity extends Activity implements MessageListener, O
 					listItems.add(listItem);
 				}
 
-				SimpleAdapter simpleAdapter = new SimpleAdapter(ConversationActivity.this, listItems,
-						R.layout.single_expression, new String[] { "image" }, new int[] { R.id.image });
+				SimpleAdapter simpleAdapter = new SimpleAdapter(ConversationActivity.this, listItems, R.layout.single_expression,
+						new String[] { "image" }, new int[] { R.id.image });
 				gView2.setAdapter(simpleAdapter);
 				break;
 			case 2:
@@ -759,8 +763,8 @@ public class ConversationActivity extends Activity implements MessageListener, O
 					listItems1.add(listItem);
 				}
 
-				SimpleAdapter simpleAdapter1 = new SimpleAdapter(ConversationActivity.this, listItems1,
-						R.layout.single_expression, new String[] { "image" }, new int[] { R.id.image });
+				SimpleAdapter simpleAdapter1 = new SimpleAdapter(ConversationActivity.this, listItems1, R.layout.single_expression,
+						new String[] { "image" }, new int[] { R.id.image });
 				gView3.setAdapter(simpleAdapter1);
 				break;
 
@@ -821,15 +825,41 @@ public class ConversationActivity extends Activity implements MessageListener, O
 			break;
 		// 图片
 		case R.id.im_ll_file: {
-			Intent intent = new Intent(Intent.ACTION_PICK,
-					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 			startActivityForResult(intent, 1);
 		}
 			break;
+
+		// 会话详情
+		case R.id.btn_menu:
+			jumpConversationDetail();
+			break;
+
 		default:
 			break;
 		}
 	}
+
+	/**
+	 * 跳转会话详情页面
+	 */
+	private void jumpConversationDetail() {
+		// TODO Auto-generated method stub
+		Intent intent = null;
+		if (CategoryId.PERSONAL == mConversationInfo.getCategoryId()) {
+
+		} else if (CategoryId.DISCUSSION == mConversationInfo.getCategoryId()) {
+			intent = new Intent(this, DiscussionDetailActivity.class);
+			intent.putExtra("conversation", mConversationInfo);
+		} else if (CategoryId.GROUP == mConversationInfo.getCategoryId()) {
+			
+		}
+
+		if (intent != null) {
+			startActivity(intent);
+		}
+	}
+	
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

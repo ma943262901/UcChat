@@ -95,6 +95,18 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 			e.printStackTrace();
 		}
 	}
+	
+	protected void showRightMenu(int resId) {
+		try {
+			ImageView btnMenu = (ImageView) findViewById(R.id.btn_menu);
+			btnMenu.setImageResource(resId);
+			btnMenu.setVisibility(View.VISIBLE);
+			btnMenu.setOnClickListener(this);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * 设置标题

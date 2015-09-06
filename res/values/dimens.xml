@@ -12,6 +12,7 @@
     
       <!-- 内容大小 -->
     <dimen name="content_size">16sp</dimen>
+    <dimen name="textsize_small">14sp</dimen>
     
     <!-- 通信录LinearLayout高度 -->
      <dimen name="ll_addrs_height">55dip</dimen>

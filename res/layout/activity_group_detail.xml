@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_bg"
+    android:orientation="vertical" >
+
+    <include layout="@layout/include_head_layout" />
+
+    <LinearLayout
+        android:id="@+id/ll_im_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_text_bg_white"
+        android:padding="15dip" >
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="讨论组名称"
+            android:textColor="@color/black_text"
+            android:textSize="@dimen/content_size" />
+
+        <TextView
+            android:id="@+id/tv_im_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:singleLine="true"
+            android:text="云之讯"
+            android:textColor="@color/gray_text"
+            android:textSize="@dimen/content_size" />
+    </LinearLayout>
+
+    <include layout="@layout/include_line_layout" />
+
+    <GridView
+        android:id="@+id/gv_im_member"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="10dip"
+        android:cacheColorHint="#00000000"
+        android:horizontalSpacing="10dip"
+        android:numColumns="4"
+        android:verticalSpacing="10dip" >
+    </GridView>
+
+    <Button
+        android:id="@+id/btn_im_detail_exit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dip"
+        android:background="@drawable/selector_button_exit"
+        android:gravity="center"
+        android:padding="5dip"
+        android:text="删除并退出"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+</LinearLayout>

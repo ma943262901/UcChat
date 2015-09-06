@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="5dip"
+    android:background="@drawable/shape_btn_rect_white"
+    android:orientation="vertical"
+    android:padding="20dip" >
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/notice"
+        android:textColor="@color/light_blue"
+        android:textSize="20sp" />
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="0.5dip"
+        android:layout_marginTop="10dip"
+        layout="@layout/include_line_layout" />
+
+    <EditText
+        android:id="@+id/et_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:background="@drawable/shape_btn_rect_normal"
+        android:inputType="text"
+        android:singleLine="true"
+        android:padding="10dip"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip" >
+
+        <Button
+            android:id="@+id/btn_cancle"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/selector_button_cancle"
+            android:gravity="center"
+            android:padding="10dip"
+            android:text="取消"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dip"
+            android:layout_weight="1"
+            android:background="@drawable/selector_button_ok"
+            android:gravity="center"
+            android:padding="10dip"
+            android:text="确定"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+</LinearLayout>

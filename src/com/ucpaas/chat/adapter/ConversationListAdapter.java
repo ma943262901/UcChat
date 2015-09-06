@@ -55,6 +55,7 @@ public class ConversationListAdapter extends BaseAdapter {
 		return position;
 	}
 
+	@SuppressWarnings("unchecked")
 	@SuppressLint("InflateParams")
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ConversationInfo conversationInfo = getItem(position);

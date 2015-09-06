@@ -2,6 +2,9 @@ package com.ucpaas.chat.adapter;
 
 import java.util.List;
 
+import com.ucpaas.chat.R;
+import com.ucpaas.chat.bean.GroupInfo;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,11 +13,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.ucpaas.chat.R;
-import com.ucpaas.chat.bean.GroupInfo;
-import com.yzxIM.data.CategoryId;
-import com.yzxIM.data.db.ConversationInfo;
 
 /**
  * 群组列表

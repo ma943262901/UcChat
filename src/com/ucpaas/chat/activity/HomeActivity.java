@@ -1,12 +1,5 @@
 package com.ucpaas.chat.activity;
 
-import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.view.KeyEvent;
-import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
-import android.widget.Toast;
-
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.base.BaseFragmentActivity;
 import com.ucpaas.chat.fragment.ContactFragment;
@@ -19,6 +12,13 @@ import com.ucpaas.chat.fragment.ContactFragment;
  */
 import com.ucpaas.chat.fragment.ConversationListFragment;
 import com.ucpaas.chat.fragment.MeFragment;
+
+import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.view.KeyEvent;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.Toast;
 
 /**
  * 首页
@@ -37,7 +37,7 @@ public class HomeActivity extends BaseFragmentActivity implements OnCheckedChang
 	private String mFormerTag;
 	private final static String FIRST_TAG = "FirstFragment";
 	private final static String SECOND_TAG = "SecondFragment";
-	private final static String THIRD_TAG = "ThirdFragment";
+	// private final static String THIRD_TAG = "ThirdFragment";
 	private final static String FOURTH_TAG = "FourthFragment";
 
 	private long exitTime;
@@ -58,7 +58,7 @@ public class HomeActivity extends BaseFragmentActivity implements OnCheckedChang
 		getSupportFragmentManager().beginTransaction().add(R.id.main_content, mFirstFragment, FIRST_TAG).commit();
 
 		mGroup.setOnCheckedChangeListener(this);
-		
+
 		hideBackButton();
 	}
 

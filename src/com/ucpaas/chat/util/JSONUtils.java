@@ -8,7 +8,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ucpaas.chat.bean.GroupInfo;
 import com.ucpaas.chat.bean.UserInfo;
-import com.yzxtcp.tools.CustomLog;
 
 /**
  * JSON相关工具
@@ -27,7 +26,13 @@ public class JSONUtils {
 	 * @return
 	 */
 	public static <T> T parseObject(String text, Class<T> clazz) {
-		return JSON.parseObject(text, clazz);
+		try {
+			return JSON.parseObject(text, clazz);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**

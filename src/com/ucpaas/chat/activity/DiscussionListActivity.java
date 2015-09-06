@@ -3,13 +3,6 @@ package com.ucpaas.chat.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Intent;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ListView;
-
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.adapter.DiscussionListAdapter;
 import com.ucpaas.chat.base.BaseActivity;
@@ -22,6 +15,13 @@ import com.yzxIM.data.db.DiscussionInfo;
 import com.yzxIM.listener.DiscussionGroupCallBack;
 import com.yzxtcp.data.UcsReason;
 
+import android.content.Intent;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ListView;
+
 /**
  * 讨论组列表
  * 
@@ -29,8 +29,7 @@ import com.yzxtcp.data.UcsReason;
  * @date 2015年9月3日下午3:19:23
  */
 
-public class DiscussionListActivity extends BaseActivity implements OnItemClickListener, OnItemLongClickListener,
-		DiscussionGroupCallBack {
+public class DiscussionListActivity extends BaseActivity implements OnItemClickListener, OnItemLongClickListener, DiscussionGroupCallBack {
 	private ListView mListView;
 	private DiscussionListAdapter mAdapter;
 
@@ -84,6 +83,9 @@ public class DiscussionListActivity extends BaseActivity implements OnItemClickL
 		}
 	}
 
+	/**
+	 * 跳转聊天界面
+	 */
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// TODO Auto-generated method stub
@@ -93,6 +95,9 @@ public class DiscussionListActivity extends BaseActivity implements OnItemClickL
 		startActivity(intent);
 	}
 
+	/**
+	 * 长按删除会话
+	 */
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 		// TODO Auto-generated method stub
@@ -103,6 +108,12 @@ public class DiscussionListActivity extends BaseActivity implements OnItemClickL
 		return true;
 	}
 
+	/**
+	 * 获取所有讨论组
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
 	private List<ConversationInfo> getDiscussionList() {
 		List<ConversationInfo> conversationInfoList = mIMManager.getConversationList(CategoryId.DISCUSSION.ordinal());
 		if (conversationInfoList == null) {
@@ -111,6 +122,11 @@ public class DiscussionListActivity extends BaseActivity implements OnItemClickL
 		return conversationInfoList;
 	}
 
+	/**
+	 * 同步更新数据
+	 * 
+	 * @param msg
+	 */
 	private void sync(final String msg) {
 		runOnUiThread(new Runnable() {
 
