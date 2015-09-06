@@ -75,8 +75,7 @@ import com.yzxIM.listener.MessageListener;
  * 
  */
 @SuppressLint({ "InflateParams", "SimpleDateFormat" })
-public class ConversationActivity extends Activity implements MessageListener,
-		OnClickListener {
+public class ConversationActivity extends Activity implements MessageListener, OnClickListener {
 
 	private IMManager mIMManager;
 	private ConversationInfo mConversationInfo;
@@ -85,7 +84,11 @@ public class ConversationActivity extends Activity implements MessageListener,
 	private Context mContext;
 	private ConversationReplyAdapter mAdapter;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
+	private TextView mTitleView;
+
 	private String mUserId;
+	private static final int REQUEST_CODE_IMAGE = 1;
+	private static final int REQUEST_CODE_DISCUSSION = 2;
 
 	@SuppressLint("HandlerLeak")
 	private Handler mHandler = new Handler() {
@@ -103,21 +106,18 @@ public class ConversationActivity extends Activity implements MessageListener,
 
 		mIMManager = IMManager.getInstance(this); // 获得IMManager类
 		mIMManager.setSendMsgListener(this);
-		mConversationInfo = (ConversationInfo) getIntent()
-				.getSerializableExtra("conversation");
+		mConversationInfo = (ConversationInfo) getIntent().getSerializableExtra("conversation");
 		mChatMessages = mConversationInfo.getAllMessage();
 		mUserId = SpOperation.getUserId(this);
 
 		initView();
-		mAdapter = new ConversationReplyAdapter(ConversationActivity.this,
-				mChatMessages);
+		mAdapter = new ConversationReplyAdapter(ConversationActivity.this, mChatMessages);
 		mListView.setAdapter(mAdapter);
 		sync();
 	}
 
 	private void initView() {
-		// 标题
-		TextView mTitleView = (TextView) findViewById(R.id.tv_title);
+		mTitleView = (TextView) findViewById(R.id.tv_title);
 		mTitleView.setText(mConversationInfo.getConversationTitle());
 
 		// 会话详情
@@ -242,8 +242,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 	}
 
 	@Override
-	public void onDownloadAttachedProgress(String arg0, String arg1, int arg2,
-			int arg3) {
+	public void onDownloadAttachedProgress(String arg0, String arg1, int arg2, int arg3) {
 		// TODO Auto-generated method stub
 
 	}
@@ -254,8 +253,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 	@Override
 	public void onReceiveMessage(final List arg0) {
 		// TODO Auto-generated method stub
-		LogUtil.log("onReceiveMessage getMsgType:"
-				+ ((ChatMessage) arg0.get(0)).getMsgType());
+		LogUtil.log("onReceiveMessage getMsgType:" + ((ChatMessage) arg0.get(0)).getMsgType());
 
 		mChatMessages.addAll(arg0);
 		runOnUiThread(new Runnable() {
@@ -348,15 +346,13 @@ public class ConversationActivity extends Activity implements MessageListener,
 		mInputEdit.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				// TODO Auto-generated method stub
 
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 				mSendBtn.setVisibility(View.VISIBLE);
 				mBtnMore.setVisibility(View.GONE);
 			}
@@ -459,8 +455,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 					if (recodeTime < MIN_RECORD_TIME) {
 						showWarnToast("时间太短  录音失败");
 					} else {
-						textView_record_time.setText("录音时间："
-								+ ((int) recodeTime));
+						textView_record_time.setText("录音时间：" + ((int) recodeTime));
 						String path = mAudioRecorder.getRecordPath();
 						sendVoiceMessage(path, (int) recodeTime + "");
 						// mTvRecordPath.setText("文件路径：" + getAmrPath());
@@ -474,8 +469,8 @@ public class ConversationActivity extends Activity implements MessageListener,
 
 	// 删除老文件
 	void deleteOldFile() {
-		File file = new File(Environment.getExternalStorageDirectory(),
-				"WifiChat/voiceRecord/" + RECORD_FILENAME + ".amr");
+		File file = new File(Environment.getExternalStorageDirectory(), "WifiChat/voiceRecord/" + RECORD_FILENAME
+				+ ".amr");
 		if (file.exists()) {
 			file.delete();
 		}
@@ -484,17 +479,13 @@ public class ConversationActivity extends Activity implements MessageListener,
 	// 录音时显示Dialog
 	void showVoiceDialog(int flag) {
 		if (mRecordDialog == null) {
-			mRecordDialog = new Dialog(ConversationActivity.this,
-					R.style.DialogStyle);
+			mRecordDialog = new Dialog(ConversationActivity.this, R.style.DialogStyle);
 			mRecordDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			mRecordDialog.getWindow().setFlags(
-					WindowManager.LayoutParams.FLAG_FULLSCREEN,
+			mRecordDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 					WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			mRecordDialog.setContentView(R.layout.record_dialog);
-			mIvRecVolume = (ImageView) mRecordDialog
-					.findViewById(R.id.record_dialog_img);
-			mTvRecordDialogTxt = (TextView) mRecordDialog
-					.findViewById(R.id.record_dialog_txt);
+			mIvRecVolume = (ImageView) mRecordDialog.findViewById(R.id.record_dialog_img);
+			mTvRecordDialogTxt = (TextView) mRecordDialog.findViewById(R.id.record_dialog_txt);
 		}
 		switch (flag) {
 		case 1:
@@ -670,16 +661,14 @@ public class ConversationActivity extends Activity implements MessageListener,
 			listItems.add(listItem);
 		}
 
-		simpleAdapter = new SimpleAdapter(ConversationActivity.this, listItems,
-				R.layout.single_expression, new String[] { "image" },
-				new int[] { R.id.image });
+		simpleAdapter = new SimpleAdapter(ConversationActivity.this, listItems, R.layout.single_expression,
+				new String[] { "image" }, new int[] { R.id.image });
 		gView1.setAdapter(simpleAdapter);
 		grids.add(gView1);
 		gView1.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				doClickExpression(parent, view, position, id, gView1);
 			}
 		});
@@ -689,22 +678,20 @@ public class ConversationActivity extends Activity implements MessageListener,
 		gView2.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				doClickExpression(parent, view, position, id, gView2);
 			}
-		});	
-		
+		});
+
 		gView3 = (GridView) inflater.inflate(R.layout.grid3, null);
 		grids.add(gView3);
 		gView3.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				doClickExpression(parent, view, position, id, gView3);
 			}
-		});	
+		});
 
 		// 填充ViewPager的数据适配器
 		PagerAdapter mPagerAdapter = new PagerAdapter() {
@@ -772,19 +759,14 @@ public class ConversationActivity extends Activity implements MessageListener,
 		public void onPageSelected(int arg0) {
 			switch (arg0) {
 			case 0:
-				page0.setImageDrawable(getResources().getDrawable(
-						R.drawable.page_focused));
-				page1.setImageDrawable(getResources().getDrawable(
-						R.drawable.page_unfocused));
+				page0.setImageDrawable(getResources().getDrawable(R.drawable.page_focused));
+				page1.setImageDrawable(getResources().getDrawable(R.drawable.page_unfocused));
 
 				break;
 			case 1:
-				page1.setImageDrawable(getResources().getDrawable(
-						R.drawable.page_focused));
-				page0.setImageDrawable(getResources().getDrawable(
-						R.drawable.page_unfocused));
-				page2.setImageDrawable(getResources().getDrawable(
-						R.drawable.page_unfocused));
+				page1.setImageDrawable(getResources().getDrawable(R.drawable.page_focused));
+				page0.setImageDrawable(getResources().getDrawable(R.drawable.page_unfocused));
+				page2.setImageDrawable(getResources().getDrawable(R.drawable.page_unfocused));
 				List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
 				// 生成24个表情
 				for (int i = 0; i < 24; i++) {
@@ -793,19 +775,14 @@ public class ConversationActivity extends Activity implements MessageListener,
 					listItems.add(listItem);
 				}
 
-				SimpleAdapter simpleAdapter = new SimpleAdapter(
-						ConversationActivity.this, listItems,
-						R.layout.single_expression, new String[] { "image" },
-						new int[] { R.id.image });
+				SimpleAdapter simpleAdapter = new SimpleAdapter(ConversationActivity.this, listItems,
+						R.layout.single_expression, new String[] { "image" }, new int[] { R.id.image });
 				gView2.setAdapter(simpleAdapter);
 				break;
 			case 2:
-				page2.setImageDrawable(getResources().getDrawable(
-						R.drawable.page_focused));
-				page1.setImageDrawable(getResources().getDrawable(
-						R.drawable.page_unfocused));
-				page0.setImageDrawable(getResources().getDrawable(
-						R.drawable.page_unfocused));
+				page2.setImageDrawable(getResources().getDrawable(R.drawable.page_focused));
+				page1.setImageDrawable(getResources().getDrawable(R.drawable.page_unfocused));
+				page0.setImageDrawable(getResources().getDrawable(R.drawable.page_unfocused));
 				List<Map<String, Object>> listItems1 = new ArrayList<Map<String, Object>>();
 				// 生成24个表情
 				for (int i = 0; i < 24; i++) {
@@ -814,10 +791,8 @@ public class ConversationActivity extends Activity implements MessageListener,
 					listItems1.add(listItem);
 				}
 
-				SimpleAdapter simpleAdapter1 = new SimpleAdapter(
-						ConversationActivity.this, listItems1,
-						R.layout.single_expression, new String[] { "image" },
-						new int[] { R.id.image });
+				SimpleAdapter simpleAdapter1 = new SimpleAdapter(ConversationActivity.this, listItems1,
+						R.layout.single_expression, new String[] { "image" }, new int[] { R.id.image });
 				gView3.setAdapter(simpleAdapter1);
 				break;
 
@@ -828,8 +803,7 @@ public class ConversationActivity extends Activity implements MessageListener,
 	/**
 	 * 选中表情处理过程
 	 */
-	private void doClickExpression(AdapterView<?> parent, View view,
-			int position, long id, GridView gView) {
+	private void doClickExpression(AdapterView<?> parent, View view, int position, long id, GridView gView) {
 		int imgId = 0;
 		String imgName = null;
 		if (gView == gView1) {
@@ -844,8 +818,8 @@ public class ConversationActivity extends Activity implements MessageListener,
 			imgName = eImageNames2[position];
 		}
 
-		SpannableString spannableString = ExpressionUtil.getInstace().addFace(
-				ConversationActivity.this, imgId, imgName);
+		SpannableString spannableString = ExpressionUtil.getInstace()
+				.addFace(ConversationActivity.this, imgId, imgName);
 		mInputEdit.append(spannableString);
 	}
 
@@ -903,10 +877,9 @@ public class ConversationActivity extends Activity implements MessageListener,
 		// 图片
 		case R.id.im_ll_file: {
 
-			Intent intent = new Intent(
-					Intent.ACTION_PICK,
+			Intent intent = new Intent(Intent.ACTION_PICK,
 					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-			startActivityForResult(intent, 1);
+			startActivityForResult(intent, REQUEST_CODE_IMAGE);
 		}
 			break;
 
@@ -931,38 +904,55 @@ public class ConversationActivity extends Activity implements MessageListener,
 		} else if (CategoryId.DISCUSSION == mConversationInfo.getCategoryId()) {
 			intent = new Intent(this, DiscussionDetailActivity.class);
 			intent.putExtra("conversation", mConversationInfo);
+			startActivityForResult(intent, REQUEST_CODE_DISCUSSION);
 		} else if (CategoryId.GROUP == mConversationInfo.getCategoryId()) {
 
-		}
-
-		if (intent != null) {
-			startActivity(intent);
 		}
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == Activity.RESULT_OK) {
-			String path = null;
-			Uri uri = data.getData();
-			Cursor cursor = this.getContentResolver().query(uri, null, null,
-					null, null);
-			cursor.moveToFirst();
-			for (int i = 0; i < cursor.getColumnCount(); i++) {// 取得图片uri的列名和此列的详细信息
-																// String str =
-																// i + "-" +
-																// cursor.getColumnName(i)
-																// + "-" +
-																// cursor.getString(i);
-				// System.out.println(i + "-" + cursor.getColumnName(i) + "-" +
-				// cursor.getString(i));
-				int index = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-				path = cursor.getString(index);
+
+		switch (requestCode) {
+		case REQUEST_CODE_IMAGE:
+			if (resultCode == Activity.RESULT_OK) {
+				String path = null;
+				Uri uri = data.getData();
+				Cursor cursor = this.getContentResolver().query(uri, null, null, null, null);
+				cursor.moveToFirst();
+				for (int i = 0; i < cursor.getColumnCount(); i++) {// 取得图片uri的列名和此列的详细信息
+																	// String
+																	// str =
+																	// i + "-" +
+																	// cursor.getColumnName(i)
+																	// + "-" +
+																	// cursor.getString(i);
+					// System.out.println(i + "-" + cursor.getColumnName(i) +
+					// "-" +
+					// cursor.getString(i));
+					int index = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+					path = cursor.getString(index);
+				}
+				if (path != null) {
+					sendImageMessage(path, path);
+				}
 			}
-			if (path != null) {
-				sendImageMessage(path, path);
+
+			break;
+
+		case REQUEST_CODE_DISCUSSION:
+			if (resultCode == Activity.RESULT_OK) {
+				finish();
+			} else if (resultCode == 1) {
+				String title = data.getStringExtra("title");
+				mTitleView.setText(title);
 			}
+			break;
+
+		default:
+			break;
 		}
+
 	}
 
 }

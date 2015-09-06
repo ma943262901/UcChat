@@ -4,18 +4,6 @@ package com.ucpaas.chat.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ucpaas.chat.R;
-import com.ucpaas.chat.adapter.DiscussionGridAdapter;
-import com.ucpaas.chat.base.BaseActivity;
-import com.ucpaas.chat.bean.DiscussionMember;
-import com.ucpaas.chat.listener.ConfirmListener;
-import com.ucpaas.chat.util.LogUtil;
-import com.ucpaas.chat.util.ToastUtil;
-import com.ucpaas.chat.view.EditDialog;
-import com.yzxIM.IMManager;
-import com.yzxIM.data.db.ConversationInfo;
-import com.yzxIM.data.db.DiscussionInfo;
-
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,6 +12,18 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.ucpaas.chat.R;
+import com.ucpaas.chat.adapter.DiscussionGridAdapter;
+import com.ucpaas.chat.base.BaseActivity;
+import com.ucpaas.chat.bean.UserInfo;
+import com.ucpaas.chat.listener.ConfirmListener;
+import com.ucpaas.chat.util.LogUtil;
+import com.ucpaas.chat.util.ToastUtil;
+import com.ucpaas.chat.view.EditDialog;
+import com.yzxIM.IMManager;
+import com.yzxIM.data.db.ConversationInfo;
+import com.yzxIM.data.db.DiscussionInfo;
 
 /**
  * 群组详情
@@ -39,7 +39,7 @@ public class GroupDetailActivity extends BaseActivity implements OnItemClickList
 	private ConversationInfo mConversationInfo;
 	private IMManager mIMManager;
 	private DiscussionInfo mDiscussionInfo;
-	private List<DiscussionMember> mDiscussionMemberList;
+	private List<UserInfo> mUserInfo;
 
 	private TextView mTvImName;
 
@@ -57,10 +57,10 @@ public class GroupDetailActivity extends BaseActivity implements OnItemClickList
 		if (mConversationInfo != null) {
 			mDiscussionInfo = mIMManager.getDiscussionInfo(mConversationInfo.getTargetId());
 			String members = mDiscussionInfo.getDiscussionMembers();
-			mDiscussionMemberList = getDiscussionMemberList(members);
+			mUserInfo = getUserInfoList(members);
 			LogUtil.log("members:" + members);
 		} else {
-			mDiscussionMemberList = new ArrayList<DiscussionMember>();
+			mUserInfo = new ArrayList<UserInfo>();
 		}
 	}
 
@@ -82,7 +82,7 @@ public class GroupDetailActivity extends BaseActivity implements OnItemClickList
 
 		// 成员
 		mGridView = (GridView) findViewById(R.id.gv_im_member);
-		mAdpater = new DiscussionGridAdapter(this, mDiscussionMemberList);
+		mAdpater = new DiscussionGridAdapter(this, mUserInfo);
 		mGridView.setAdapter(mAdpater);
 		mGridView.setOnItemClickListener(this);
 	}
@@ -146,16 +146,16 @@ public class GroupDetailActivity extends BaseActivity implements OnItemClickList
 	 * @param members
 	 * @return
 	 */
-	public List<DiscussionMember> getDiscussionMemberList(String members) {
-		List<DiscussionMember> discussionMemberList = new ArrayList<DiscussionMember>();
+	public List<UserInfo> getUserInfoList(String members) {
+		List<UserInfo> discussionMemberList = new ArrayList<UserInfo>();
 
 		if (!TextUtils.isEmpty(members)) {
 			String[] memberList = members.split(",");
 			if (memberList != null) {
 				for (String member : memberList) {
-					DiscussionMember discussionMember = new DiscussionMember();
-					discussionMember.setUserId(member);
-					discussionMemberList.add(discussionMember);
+					UserInfo userInfo = new UserInfo();
+					userInfo.setPhone(member);
+					discussionMemberList.add(userInfo);
 				}
 			}
 		}

@@ -2,10 +2,6 @@ package com.ucpaas.chat.adapter;
 
 import java.util.List;
 
-import com.ucpaas.chat.R;
-import com.ucpaas.chat.bean.DiscussionMember;
-import com.ucpaas.chat.support.SpOperation;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
@@ -15,6 +11,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.ucpaas.chat.R;
+import com.ucpaas.chat.bean.UserInfo;
+import com.ucpaas.chat.support.SpOperation;
 
 /**
  * 讨论组成员-适配器
@@ -26,26 +26,27 @@ import android.widget.TextView;
 public class DiscussionGridAdapter extends BaseAdapter {
 
 	private Context context;
-	private List<DiscussionMember> list;
+	private List<UserInfo> list;
 	private String mUserId;
 
-	public DiscussionGridAdapter(Context context, List<DiscussionMember> list) {
+	public DiscussionGridAdapter(Context context, List<UserInfo> list) {
 		super();
 		this.context = context;
 		this.list = list;
 		this.mUserId = SpOperation.getUserId(context);
 	}
 
-	public void setList(List<DiscussionMember> list) {
+	public void setList(List<UserInfo> list) {
 		this.list = list;
+		notifyDataSetChanged();
 	}
 
 	public int getCount() {
-		return list.size() + 2;
+		return list.size() + 1;
 	}
 
 	@Override
-	public DiscussionMember getItem(int position) {
+	public UserInfo getItem(int position) {
 		return list.get(position);
 	}
 
@@ -67,23 +68,21 @@ public class DiscussionGridAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		if (position == getCount() - 2) {
+		if (position == getCount() - 1) {
 			holder.tvMemberName.setText("");
 			holder.ivMember.setImageResource(R.drawable.member_add);
-		} else if (position == getCount() - 1) {
-			holder.tvMemberName.setText("");
-			holder.ivMember.setImageResource(R.drawable.member_delete);
 		} else {
-			DiscussionMember discussionMember = getItem(position);
-			String userId = discussionMember.getUserId();
+			holder.ivMember.setImageResource(R.drawable.person);
+			UserInfo userInfo = getItem(position);
+			String userId = userInfo.getPhone();
 			if (userId.equals(mUserId)) {
 				holder.tvMemberName.setText("我");
 			} else {
-				String nickName = discussionMember.getUserName();
+				String nickName = userInfo.getNickname();
 				if (!TextUtils.isEmpty(nickName)) {
 					holder.tvMemberName.setText(nickName);
 				} else {
-					holder.tvMemberName.setText(discussionMember.getUserId());
+					holder.tvMemberName.setText(userInfo.getPhone());
 				}
 			}
 

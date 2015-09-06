@@ -16,6 +16,7 @@ import com.yzxIM.listener.DiscussionGroupCallBack;
 import com.yzxtcp.data.UcsReason;
 
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -29,7 +30,8 @@ import android.widget.ListView;
  * @date 2015年9月3日下午3:19:23
  */
 
-public class DiscussionListActivity extends BaseActivity implements OnItemClickListener, OnItemLongClickListener, DiscussionGroupCallBack {
+public class DiscussionListActivity extends BaseActivity implements OnItemClickListener, OnItemLongClickListener,
+		DiscussionGroupCallBack {
 	private ListView mListView;
 	private DiscussionListAdapter mAdapter;
 
@@ -49,7 +51,7 @@ public class DiscussionListActivity extends BaseActivity implements OnItemClickL
 		mIMManager = IMManager.getInstance(this);
 		mIMManager.setDiscussionGroup(this);
 		mDiscussionInfo = new DiscussionInfo();
-		mConversationInfoList = getDiscussionList();
+		mConversationInfoList = new ArrayList<ConversationInfo>();
 	}
 
 	@Override
@@ -122,6 +124,15 @@ public class DiscussionListActivity extends BaseActivity implements OnItemClickL
 		return conversationInfoList;
 	}
 
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		mConversationInfoList = getDiscussionList();
+		mAdapter.setList(mConversationInfoList);
+		sync("");
+		super.onResume();
+	}
+
 	/**
 	 * 同步更新数据
 	 * 
@@ -133,15 +144,23 @@ public class DiscussionListActivity extends BaseActivity implements OnItemClickL
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				ToastUtil.show(DiscussionListActivity.this, msg);
+				if (!TextUtils.isEmpty(msg)) {
+					ToastUtil.show(DiscussionListActivity.this, msg);
+				}
 				mAdapter.notifyDataSetChanged();
 			}
 		});
 	}
 
+	/**
+	 * 新建讨论组
+	 */
 	private void addDiscussionGroup() {
 		// TODO Auto-generated method stub
-		createDiscussionGroup();
+		Intent intent = new Intent(this, DiscussionAddActivity.class);
+		intent.putExtra("title", "创建讨论组");
+		startActivity(intent);
+		// createDiscussionGroup();
 	}
 
 	private void createDiscussionGroup() {

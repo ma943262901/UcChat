@@ -66,6 +66,16 @@ public class SpOperation {
 	public static String getUserId(Context context) {
 		return SpHelper.getInstance(context).get(SpKey.PHONE);
 	}
+	
+	/**
+	 * 获取昵称
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static String getNickName(Context context) {
+		return SpHelper.getInstance(context).get(SpKey.NICKNAME);
+	}
 
 	/**
 	 * 判断是否第一次登录

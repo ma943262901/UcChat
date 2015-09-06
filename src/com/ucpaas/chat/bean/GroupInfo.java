@@ -3,7 +3,7 @@ package com.ucpaas.chat.bean;
 import java.util.List;
 
 /**
- *
+ * 群组
  * @author tangqi
  * @date 2015年9月5日下午11:20:39
  */

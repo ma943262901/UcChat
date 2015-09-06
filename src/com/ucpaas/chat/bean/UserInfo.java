@@ -30,6 +30,9 @@ public class UserInfo extends BaseEntity{
 	
 	@Column(column = "userid")
 	private String userid;
+	
+	@Column(column = "isChecked")
+	private boolean isChecked;
 
 	public String getResult() {
 		return result;
@@ -83,6 +86,14 @@ public class UserInfo extends BaseEntity{
 
 	public void setUserid(String userid) {
 		this.userid = userid;
+	}
+
+	public boolean isChecked() {
+		return isChecked;
+	}
+
+	public void setChecked(boolean isChecked) {
+		this.isChecked = isChecked;
 	}
 
 }
