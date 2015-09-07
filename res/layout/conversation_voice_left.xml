@@ -10,19 +10,31 @@
         android:layout_height="41dp"
         android:layout_alignParentLeft="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/fb_default_dev_portrait" />
+        android:src="@drawable/fb_default_user_portrait" />
+
+    <TextView
+        android:id="@+id/tv_left_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="35dp"
+        android:layout_toRightOf="@id/user_portrait"
+        android:text="云信"
+        android:textColor="@color/black_text"
+        android:textSize="@dimen/textsize_im_name" />
 
     <LinearLayout
         android:id="@+id/fb_reply_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/user_portrait"
+        android:layout_below="@id/tv_left_name"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="35dp"
+        android:layout_marginTop="5dip"
         android:layout_toRightOf="@id/user_portrait"
         android:orientation="horizontal" >
 
-                <FrameLayout
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
 
@@ -35,9 +47,9 @@
                 android:id="@+id/img_voice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/left_audio3"
                 android:layout_gravity="center_vertical|right"
-                android:layout_marginRight="10dp"/>
+                android:layout_marginRight="10dp"
+                android:background="@drawable/left_audio3" />
         </FrameLayout>
 
         <TextView

@@ -11,10 +11,22 @@
         android:scaleType="centerCrop"
         android:src="@drawable/fb_default_user_portrait" />
 
+    <TextView
+        android:id="@+id/tv_left_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="35dp"
+        android:layout_toRightOf="@id/user_portrait"
+        android:text="云信"
+        android:textColor="@color/black_text"
+        android:textSize="@dimen/textsize_im_name" />
+
     <LinearLayout
         android:id="@+id/fb_reply_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/tv_left_name"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="35dp"
         android:layout_toRightOf="@id/user_portrait"
@@ -32,6 +44,7 @@
                 android:id="@+id/fb_reply_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
                 android:background="@drawable/fb_user_reply_bg"
                 android:gravity="left"
                 android:paddingBottom="12dp"
