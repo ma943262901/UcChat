@@ -3,6 +3,13 @@ package com.ucpaas.chat.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ucpaas.chat.R;
+import com.ucpaas.chat.util.DateUtil;
+import com.yzxIM.data.CategoryId;
+import com.yzxIM.data.MSGTYPE;
+import com.yzxIM.data.db.ChatMessage;
+import com.yzxIM.data.db.ConversationInfo;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
@@ -12,13 +19,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.ucpaas.chat.R;
-import com.ucpaas.chat.util.DateUtil;
-import com.yzxIM.data.CategoryId;
-import com.yzxIM.data.MSGTYPE;
-import com.yzxIM.data.db.ChatMessage;
-import com.yzxIM.data.db.ConversationInfo;
 
 /**
  * 会话列表
@@ -121,7 +121,6 @@ public class ConversationListAdapter extends BaseAdapter {
 				}
 			}
 			int unReadNum = conversationInfo.getMsgUnRead();
-			int Count = conversationInfo.getUnreadCount();
 			if (mTitle != null && conversationInfo.getConversationTitle().equals(mTitle)) {
 				holder.txvUnreadMsgNum.setText(0 + "");
 				holder.imgUpdateTips.setVisibility(View.GONE);

@@ -71,7 +71,7 @@ import com.yzxIM.data.db.SingleChat;
 import com.yzxIM.listener.MessageListener;
 
 /**
- * 自定义反馈界面
+ * 聊天界面
  * 
  * @author tangqi
  * 

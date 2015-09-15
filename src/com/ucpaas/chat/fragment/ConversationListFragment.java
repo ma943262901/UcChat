@@ -3,19 +3,7 @@ package com.ucpaas.chat.fragment;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.provider.Settings.Global;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.ucpaas.chat.R;
 import com.ucpaas.chat.activity.ConversationActivity;
@@ -24,9 +12,10 @@ import com.ucpaas.chat.base.BaseApplication;
 import com.ucpaas.chat.base.BaseFragment;
 import com.ucpaas.chat.support.SpOperation;
 import com.ucpaas.chat.util.LogUtil;
+import com.ucpaas.chat.util.RingtoneUtils;
 import com.ucpaas.chat.util.ToastUtil;
+import com.ucpaas.chat.util.VibratorUtils;
 import com.yzxIM.IMManager;
-import com.yzxIM.data.CategoryId;
 import com.yzxIM.data.MSGTYPE;
 import com.yzxIM.data.db.ChatMessage;
 import com.yzxIM.data.db.ConversationInfo;
@@ -35,6 +24,16 @@ import com.yzxIM.listener.IConversationListener;
 import com.yzxtcp.data.UcsReason;
 import com.yzxtcp.listener.ILoginListener;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.TextView;
+
 /**
  * 会话列表
  * 
@@ -42,8 +41,7 @@ import com.yzxtcp.listener.ILoginListener;
  * @date 2015年9月5日下午2:18:35
  */
 
-public class ConversationListFragment extends BaseFragment implements OnItemClickListener, IConversationListener,
-		Comparator<ConversationInfo> {
+public class ConversationListFragment extends BaseFragment implements OnItemClickListener, IConversationListener, Comparator<ConversationInfo> {
 
 	private View rootView;
 	private ListView mListView;
@@ -51,7 +49,6 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 	private ConversationListAdapter mAdapter;
 	private List<ConversationInfo> mConversationLists;
 
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -62,7 +59,6 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		if (rootView == null) {
 			rootView = inflater.inflate(R.layout.fragment_conversation_list, container, false);
 		}
@@ -96,12 +92,13 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 		mConversationLists.get(position).setMsgUnRead(0);
 		Intent intent = new Intent(getActivity(), ConversationActivity.class);
 		intent.putExtra("conversation", conversationinfo);
-		getActivity().startActivityForResult(intent, 1000);;
+		getActivity().startActivityForResult(intent, 1000);
 	}
 
 	/**
 	 * 初始化IMManager
 	 */
+	@SuppressWarnings("unchecked")
 	private void initIMManger() {
 		// TODO Auto-generated method stub
 		mIMManager = IMManager.getInstance(getActivity()); // 获得IMManager类
@@ -115,8 +112,6 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 			mAdapter = new ConversationListAdapter(getActivity(), mConversationLists);
 			mListView.setAdapter(mAdapter);
 		}
-
-		// sendMessage();
 	}
 
 	/**
@@ -145,46 +140,39 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 		});
 	}
 
+	/**
+	 * 创建会话-回调
+	 */
 	@Override
 	public void onCreateConversation(ConversationInfo cinfo) {
-		// TODO Auto-generated method stub
-
-		// 把cinfo添加到会话列表中，更新界面
 		mConversationLists.add(cinfo);
-		int mm  = cinfo.getMsgUnRead();
-		int nn = cinfo.getUnreadCount();
 		sync();
 	}
 
+	/**
+	 * 删除会话-回调
+	 */
 	@Override
 	public void onDeleteConversation(ConversationInfo cinfo) {
-		// TODO Auto-generated method stub
-
-		// 把cinfo从会话列表中移除，更新界面
 		mConversationLists.remove(cinfo);
 		sync();
 
 	}
 
+	/**
+	 * 更新会话-回调
+	 */
 	@Override
 	public void onUpdateConversation(ConversationInfo cinfoSrc) {
-		// TODO Auto-generated method stub
-		// updataCinfo(cinfoSrc, cinfoDest);
 		updateCinfo(cinfoSrc);
+		noticeUser(cinfoSrc);
 	}
 
-	private void sync() {
-		getActivity().runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				Collections.sort(mConversationLists, ConversationListFragment.this);
-				mAdapter.notifyDataSetChanged();
-			}
-		});
-	}
-
+	/**
+	 * 更新会话列表
+	 * 
+	 * @param cinfoSrc
+	 */
 	private void updateCinfo(ConversationInfo cinfoSrc) {
 		if (mConversationLists != null && cinfoSrc != null) {
 			int findNum = -1;
@@ -203,26 +191,41 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 				mConversationLists.add(0, cinfoSrc);
 			}
 
-			int num = cinfoSrc.getMsgUnRead();
 			sync();
 		}
 	}
 
-	private void updataCinfo(ConversationInfo cinfoSrc, ConversationInfo cinfoDest) {
-		mConversationLists.remove(cinfoDest);
-		cinfoDest.setDraftMsg(cinfoSrc.getDraftMsg());
-		cinfoDest.setLastTime(cinfoSrc.getLastTime());
-		if (cinfoSrc.getCategoryId() != CategoryId.GROUP) {
-			cinfoDest.setConversationTitle(cinfoSrc.getConversationTitle());
+	/**
+	 * 提醒用户-默认震动和语音
+	 * 
+	 * @param cinfoSrc
+	 */
+	private void noticeUser(ConversationInfo cinfoSrc) {
+		if (SpOperation.getUserId(getActivity()).equals(cinfoSrc.getTargetId())) {
+			RingtoneUtils.playDefault(getActivity());
+			VibratorUtils.vibrate(getActivity());
 		}
-		if (cinfoDest.getIsTop()) {
-			mConversationLists.add(0, cinfoDest);
-		} else {
-			// conversationLists.add(topNum, cinfoDest);
-		}
-		// 更新会话列表
 	}
 
+	/**
+	 * 同步会话列表数据
+	 */
+	private void sync() {
+		getActivity().runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				Collections.sort(mConversationLists, ConversationListFragment.this);
+				mAdapter.notifyDataSetChanged();
+			}
+		});
+	}
+
+	/**
+	 * 发送消息测试
+	 */
+	@SuppressWarnings("unused")
 	private void sendMessage() {
 		ChatMessage msg = null;
 		msg = new SingleChat();// 创建单聊消息
@@ -250,8 +253,13 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 		// TODO Auto-generated method stub
 		return lhs.getLastTime() >= rhs.getLastTime() ? -1 : 1;
 	}
-	
-	public void refreshData(String titleName){
+
+	/**
+	 * 更新数据
+	 * 
+	 * @param titleName
+	 */
+	public void refreshData(String titleName) {
 		mAdapter.setActivityBackTitleName(titleName);
 		mAdapter.notifyDataSetChanged();
 	}
