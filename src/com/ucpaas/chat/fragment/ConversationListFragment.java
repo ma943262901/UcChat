@@ -165,7 +165,7 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 	@Override
 	public void onUpdateConversation(ConversationInfo cinfoSrc) {
 		updateCinfo(cinfoSrc);
-		noticeUser(cinfoSrc);
+		// noticeUser(cinfoSrc);
 	}
 
 	/**
@@ -200,6 +200,7 @@ public class ConversationListFragment extends BaseFragment implements OnItemClic
 	 * 
 	 * @param cinfoSrc
 	 */
+	@SuppressWarnings("unused")
 	private void noticeUser(ConversationInfo cinfoSrc) {
 		if (SpOperation.getUserId(getActivity()).equals(cinfoSrc.getTargetId())) {
 			RingtoneUtils.playDefault(getActivity());
